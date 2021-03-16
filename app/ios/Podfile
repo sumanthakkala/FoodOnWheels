@@ -11,6 +11,8 @@ target 'FoodOnWheels' do
   pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
 
 
+  pod 'react-native-uuid-generator', :path => '../node_modules/react-native-uuid-generator'
+
   target 'FoodOnWheelsTests' do
     inherit! :complete
     # Pods for testing

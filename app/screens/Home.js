@@ -205,16 +205,19 @@ const Home = ({ navigation }) => {
         )
     }
 
+    function onRestaurantClicked(restaurantObj) {
+        navigation.navigate("Restaurant", {
+            restaurantObj,
+            currentLocation
+        })
+    }
 
 
     function renderRestaurantList() {
         const renderItem = ({ item }) => (
             <TouchableOpacity
                 style={{ marginBottom: SIZES.padding * 2 }}
-                onPress={() => navigation.navigate("Restaurant", {
-                    item,
-                    currentLocation
-                })}
+                onPress={() => onRestaurantClicked(item)}
             >
                 {/* Image */}
                 <View

@@ -13,6 +13,7 @@ import {
 
 import { icons, COLORS, SIZES, FONTS } from '../constants'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import UUIDGenerator from 'react-native-uuid-generator';
 
 const Restaurant = ({ route, navigation }) => {
 
@@ -21,14 +22,16 @@ const Restaurant = ({ route, navigation }) => {
     const [currentLocation, setCurrentLocation] = React.useState(null);
     const [orderItems, setOrderItems] = React.useState([]);
     const [orderObject, setOrderObject] = React.useState({
-        restaurantId: route.params.item.id,
+        orderId: '',
+        restaurantId: route.params.restaurantObj.id,
+        createdAt: '',
         orderedMenu: []
     });
 
     React.useEffect(() => {
-        let { item, currentLocation } = route.params;
+        let { restaurantObj, currentLocation } = route.params;
 
-        setRestaurant(item)
+        setRestaurant(restaurantObj)
         setCurrentLocation(currentLocation)
         // setOrderObject({
         //     restaurantId: item.id,
@@ -450,23 +453,27 @@ const Restaurant = ({ route, navigation }) => {
             AsyncStorage.getItem('orders').then((response) => {
                 let orders = response != null ? JSON.parse(response) : [];
                 console.log(orders)
-                orders.push(orderObject);
-                console.log(orders)
-                AsyncStorage.setItem('orders', JSON.stringify(orders)).then(() => {
-                    Alert.alert(
-                        "Thank you for placing the order.",
-                        "My Alert Msg",
-                        [
-                            {
-                                text: "View Orders", onPress: () => {
-                                    // navigation.navigate("OrderDelivery", {
-                                    //     restaurant: restaurant,
-                                    //     currentLocation: currentLocation
-                                    // })
+                //orderObject.orderId = uuid.v1();
+                UUIDGenerator.getRandomUUID().then((uuid) => {
+                    orderObject.orderId = uuid;
+                    orderObject.createdAt = new Date().toISOString();
+                    orders.push(orderObject);
+                    console.log(orders)
+                    AsyncStorage.setItem('orders', JSON.stringify(orders)).then(() => {
+                        Alert.alert(
+                            "Thank you for placing the order.",
+                            "My Alert Msg",
+                            [
+                                {
+                                    text: "View Orders", onPress: () => {
+                                        navigation.navigate("Home", {
+                                            screen: 'Profile'
+                                        })
+                                    }
                                 }
-                            }
-                        ]
-                    );
+                            ]
+                        );
+                    })
                 })
             })
         }
