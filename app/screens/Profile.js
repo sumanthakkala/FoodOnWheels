@@ -147,7 +147,7 @@ const Profile = ({ navigation }) => {
                     renderItem={renderItem}
                     contentContainerStyle={{
                         // paddingHorizontal: SIZES.padding * 2,
-                        paddingBottom: 70,
+                        paddingBottom: 80,
                     }}
                     showsVerticalScrollIndicator={false}
                 />
