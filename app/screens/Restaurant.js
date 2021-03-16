@@ -6,11 +6,13 @@ import {
     Text,
     TouchableOpacity,
     Image,
-    Animated
+    Animated,
+    Alert
 } from "react-native";
 // import { isIphoneX } from 'react-native-iphone-x-helper'
 
 import { icons, COLORS, SIZES, FONTS } from '../constants'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const Restaurant = ({ route, navigation }) => {
 
@@ -18,17 +20,26 @@ const Restaurant = ({ route, navigation }) => {
     const [restaurant, setRestaurant] = React.useState(null);
     const [currentLocation, setCurrentLocation] = React.useState(null);
     const [orderItems, setOrderItems] = React.useState([]);
+    const [orderObject, setOrderObject] = React.useState({
+        restaurantId: route.params.item.id,
+        orderedMenu: []
+    });
 
     React.useEffect(() => {
         let { item, currentLocation } = route.params;
 
         setRestaurant(item)
         setCurrentLocation(currentLocation)
+        // setOrderObject({
+        //     restaurantId: item.id,
+        //     orderedMenu: []
+        // })
     })
 
     function editOrder(action, menuId, price) {
-        let orderList = orderItems.slice()
-        let item = orderList.filter(a => a.menuId == menuId)
+        let orderObj = orderObject
+        let orderList = orderObj.orderedMenu.slice()
+        let item = orderObj.orderedMenu.filter(a => a.menuId == menuId)
 
         if (action == "+") {
             if (item.length > 0) {
@@ -43,9 +54,10 @@ const Restaurant = ({ route, navigation }) => {
                     total: price
                 }
                 orderList.push(newItem)
+                orderObj.orderedMenu = orderList;
             }
 
-            setOrderItems(orderList)
+            setOrderObject(orderObj)
         } else {
             if (item.length > 0) {
                 if (item[0]?.qty > 0) {
@@ -53,10 +65,22 @@ const Restaurant = ({ route, navigation }) => {
                     item[0].qty = newQty
                     item[0].total = newQty * price
                 }
+                if (item[0].qty == 0) {
+                    var index = orderList.indexOf(item[0]);
+                    if (index !== -1) {
+                        orderList.splice(index, 1);
+                        orderObj.orderedMenu.splice(index, 1)
+                    }
+                }
             }
 
-            setOrderItems(orderList)
+            setOrderObject(orderObj)
         }
+        setOrderItemsState()
+    }
+
+    function setOrderItemsState() {
+        setOrderItems(orderObject.orderedMenu.slice())
     }
 
     function getOrderQty(menuId) {
@@ -396,10 +420,7 @@ const Restaurant = ({ route, navigation }) => {
                                 alignItems: 'center',
                                 borderRadius: SIZES.radius
                             }}
-                            onPress={() => navigation.navigate("OrderDelivery", {
-                                restaurant: restaurant,
-                                currentLocation: currentLocation
-                            })}
+                            onPress={() => placeOrder()}
                         >
                             <Text style={{ color: COLORS.white, ...FONTS.h2 }}>Order</Text>
                         </TouchableOpacity>
@@ -421,6 +442,38 @@ const Restaurant = ({ route, navigation }) => {
                 } */}
             </View>
         )
+    }
+
+    function placeOrder() {
+        console.log(orderObject)
+        if (orderObject.orderedMenu.length > 0) {
+            AsyncStorage.getItem('orders').then((response) => {
+                let orders = response != null ? JSON.parse(response) : [];
+                console.log(orders)
+                orders.push(orderObject);
+                console.log(orders)
+                AsyncStorage.setItem('orders', JSON.stringify(orders)).then(() => {
+                    Alert.alert(
+                        "Thank you for placing the order.",
+                        "My Alert Msg",
+                        [
+                            {
+                                text: "View Orders", onPress: () => {
+                                    // navigation.navigate("OrderDelivery", {
+                                    //     restaurant: restaurant,
+                                    //     currentLocation: currentLocation
+                                    // })
+                                }
+                            }
+                        ]
+                    );
+                })
+            })
+        }
+        else {
+            alert("Please select items")
+        }
+
     }
 
     return (

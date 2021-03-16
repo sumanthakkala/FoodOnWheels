@@ -11,6 +11,7 @@ import {
 import { SearchBar } from 'react-native-elements'
 import { icons, COLORS, SIZES, FONTS } from '../constants'
 import * as dummyData from '../data/dummyData'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const styles = StyleSheet.create({
     container: {
@@ -32,12 +33,31 @@ const styles = StyleSheet.create({
 
 const Search = ({ navigation }) => {
 
+    React.useEffect(() => {
+        if (!isDataFetched) {
+            AsyncStorage.getItem('categories').then((response) => {
+                response != null ? setCategories(JSON.parse(response)) : setCategories([])
+
+                AsyncStorage.getItem('restaurants').then((response) => {
+                    response != null ? setRestaurants(JSON.parse(response)) : setRestaurants([])
+                    setIsDataFetched(true);
+                })
+            })
+        }
+
+        return () => {
+            // Cleanup
+            // setIsDataFetched(false);
+        }
+    })
+
     const [searchText, setSearchText] = React.useState("");
     const [filteredRestaurants, setFilteredRestaurants] = React.useState([]);
     // console.log(dummyData.restaurantData)
-    const [categories, setCategories] = React.useState(dummyData.categoryData)
-    const [restaurants, setRestaurants] = React.useState(dummyData.restaurantData)
+    const [categories, setCategories] = React.useState([])
+    const [restaurants, setRestaurants] = React.useState([])
     const [currentLocation, setCurrentLocation] = React.useState(dummyData.initialCurrentLocation)
+    const [isDataFetched, setIsDataFetched] = React.useState(false);
 
 
     function searchTextUpdated(text) {

@@ -11,6 +11,8 @@ import {
 import { icons, images, SIZES, COLORS, FONTS } from '../constants'
 import * as dummyData from '../data/dummyData'
 
+import AsyncStorage from '@react-native-async-storage/async-storage'
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -33,13 +35,39 @@ const styles = StyleSheet.create({
 const Home = ({ navigation }) => {
 
 
+    // React.useEffect(() => {
+    //     AsyncStorage.setItem('categories', JSON.stringify(dummyData.categoryData)).then(() => {
+    //         alert("categories saved")
+    //     })
+    //     AsyncStorage.setItem('restaurants', JSON.stringify(dummyData.restaurantData)).then(() => {
+    //         alert("restaurants saved")
+    //     })
+    // })
+
+    React.useEffect(() => {
+        if (!isDataFetched) {
+            AsyncStorage.getItem('categories').then((response) => {
+                response != null ? setCategories(JSON.parse(response)) : setCategories([])
+
+                AsyncStorage.getItem('restaurants').then((response) => {
+                    response != null ? setRestaurants(JSON.parse(response)) : setRestaurants([])
+                    setIsDataFetched(true);
+                })
+            })
+        }
+        return () => {
+            // Cleanup
+            // setIsDataFetched(false);
+        }
+    })
 
 
-    const [categories, setCategories] = React.useState(dummyData.categoryData)
+
+    const [categories, setCategories] = React.useState([])
     const [selectedCategory, setSelectedCategory] = React.useState(null)
-    const [restaurants, setRestaurants] = React.useState(dummyData.restaurantData)
+    const [restaurants, setRestaurants] = React.useState([])
     const [currentLocation, setCurrentLocation] = React.useState(dummyData.initialCurrentLocation)
-
+    const [isDataFetched, setIsDataFetched] = React.useState(false);
 
 
 
