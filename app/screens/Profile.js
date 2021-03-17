@@ -90,7 +90,7 @@ const Profile = ({ navigation }) => {
                 paddingVertical: SIZES.padding,
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                borderBottomColor: COLORS.darkgray,
+                borderBottomColor: COLORS.secondary,
                 borderBottomWidth: 1
             }}>
                 <View>
@@ -129,10 +129,10 @@ const Profile = ({ navigation }) => {
                             justifyContent: 'center',
                             paddingHorizontal: SIZES.padding * 2,
                             borderRadius: SIZES.radius,
-                            backgroundColor: COLORS.darkgray
+                            backgroundColor: COLORS.primary
                         }}
                     >
-                        <Text style={{ ...FONTS.body4, fontWeight: 'bold' }}>Visit Store</Text>
+                        <Text style={{ ...FONTS.body4, color: COLORS.white, fontWeight: 'bold' }}>Visit Store</Text>
                     </View>
                 </TouchableOpacity>
             </View >
