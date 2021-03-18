@@ -8,9 +8,7 @@ import {
     createBottomTabNavigator,
     BottomTabBar
 } from "@react-navigation/bottom-tabs"
-import Home from '../screens/Home'
-import Search from '../screens/Search'
-import Profile from '../screens/Profile'
+import { Home, Search, Profile } from '../screens'
 import { COLORS, icons } from '../constants'
 // import Svg, {Path} from "react-native-svg"
 
