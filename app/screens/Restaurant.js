@@ -7,13 +7,15 @@ import {
     TouchableOpacity,
     Image,
     Animated,
-    Alert
+    Alert,
+    FlatList
 } from "react-native";
 // import { isIphoneX } from 'react-native-iphone-x-helper'
 
 import { icons, COLORS, SIZES, FONTS } from '../constants'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import UUIDGenerator from 'react-native-uuid-generator';
+import RBSheet from "react-native-raw-bottom-sheet";
 
 const Restaurant = ({ route, navigation }) => {
 
@@ -27,6 +29,9 @@ const Restaurant = ({ route, navigation }) => {
         createdAt: '',
         orderedMenu: []
     });
+    const refRBSheet = React.useRef();
+    const [cartHeight, setCartHeight] = React.useState(300)
+
 
     React.useEffect(() => {
         let { restaurantObj, currentLocation } = route.params;
@@ -423,9 +428,10 @@ const Restaurant = ({ route, navigation }) => {
                                 alignItems: 'center',
                                 borderRadius: SIZES.radius
                             }}
-                            onPress={() => placeOrder()}
+                            // onPress={() => placeOrder()}
+                            onPress={() => refRBSheet.current.open()}
                         >
-                            <Text style={{ color: COLORS.white, ...FONTS.h2 }}>Order</Text>
+                            <Text style={{ color: COLORS.white, ...FONTS.h2 }}>View Cart</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -444,6 +450,148 @@ const Restaurant = ({ route, navigation }) => {
                     </View>
                 } */}
             </View>
+        )
+    }
+
+    function getMenuItemByMenuId(menuid) {
+        let item = restaurant.menu.filter(a => a.menuId == menuid)
+        if (item.length > 0) {
+            return item[0];
+        }
+    }
+
+    function truncateString(str) {
+        if (str.length > 24) {
+            return str.substring(0, 20) + "..."
+        }
+        else {
+            return str;
+        }
+    }
+
+    function renderCart() {
+
+        const renderItem = ({ item }) => (
+            <View style={{
+                flexDirection: 'row',
+                paddingVertical: SIZES.padding,
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                borderBottomColor: COLORS.secondary,
+                borderBottomWidth: 1
+            }}>
+                <View style={{ flexDirection: 'row' }}>
+                    <View style={{ backgroundColor: COLORS.secondary, width: 30, height: 30, alignItems: 'center', justifyContent: 'center', borderRadius: SIZES.radius }}>
+                        <Text style={{ fontSize: SIZES.body3 }}>
+                            {item.qty}
+                        </Text>
+                    </View>
+                    <View style={{ paddingHorizontal: SIZES.padding * 1.5 }}>
+
+                        <Text style={{ fontSize: SIZES.body2 }}>
+                            {truncateString(getMenuItemByMenuId(item.menuId).name)}
+                        </Text>
+
+                        {/* Calories */}
+
+                        <View
+                            style={{
+                                flexDirection: 'row',
+                                marginTop: 5,
+                                alignItems: 'center'
+                            }}
+                        >
+                            <Image
+                                source={icons.fire}
+                                style={{
+                                    width: 15,
+                                    height: 15,
+                                    marginRight: 10
+                                }}
+                            />
+
+                            <Text style={{
+                                ...FONTS.body4, color: COLORS.darkgray
+                            }}>{getMenuItemByMenuId(item.menuId).calories.toFixed(2)} cal</Text>
+                        </View>
+                    </View>
+
+                </View>
+
+
+                <Text style={{ fontSize: SIZES.body2, fontWeight: 'bold' }}>
+                    ${item.total}
+                </Text>
+            </View >
+        )
+
+
+        return (
+            <RBSheet
+                ref={refRBSheet}
+                closeOnDragDown={true}
+                closeOnPressMask={false}
+                height={800}
+                customStyles={{
+                    wrapper: {
+                        backgroundColor: "transparent",
+                    },
+                    draggableIcon: {
+                        backgroundColor: COLORS.primary
+                    },
+                    container: {
+                        alignItems: 'center',
+                        // height: cartHeight
+                    }
+                }}
+            >
+                <View onLayout={(e) => setCartHeight(e.nativeEvent.layout.height)} style={{ paddingBottom: SIZES.padding * 6, paddingTop: SIZES.padding }}>
+
+                    <View style={{
+                        alignItems: 'center', padding: SIZES.padding
+                    }}>
+                        <Text style={{ fontSize: 25, ...FONTS.body1 }}>
+                            {restaurant?.name}
+                        </Text>
+                    </View>
+
+
+                    <FlatList
+                        data={orderObject.orderedMenu}
+                        keyExtractor={item => `${item.menuId}`}
+                        renderItem={renderItem}
+                        contentContainerStyle={{
+                            // paddingHorizontal: SIZES.padding * 2,
+                            // paddingBottom: 80,
+                            flex: 1,
+                            // flexGrow: 0,
+                        }}
+                        showsVerticalScrollIndicator={false}
+                    />
+
+
+
+
+
+
+
+
+
+                    <TouchableOpacity
+                        style={{
+                            width: SIZES.width * 0.9,
+                            padding: SIZES.padding,
+                            backgroundColor: COLORS.primary,
+                            alignItems: 'center',
+                            borderRadius: SIZES.radius
+                        }}
+                        // onPress={() => placeOrder()}
+                        onPress={() => placeOrder()}
+                    >
+                        <Text style={{ color: COLORS.white, ...FONTS.h2 }}>Place Order</Text>
+                    </TouchableOpacity>
+                </View>
+            </RBSheet>
         )
     }
 
@@ -483,11 +631,14 @@ const Restaurant = ({ route, navigation }) => {
 
     }
 
+
     return (
         <SafeAreaView style={styles.container}>
             {renderHeader()}
             {renderFoodInfo()}
             {renderOrder()}
+            {renderCart()}
+
         </SafeAreaView>
     )
 }
