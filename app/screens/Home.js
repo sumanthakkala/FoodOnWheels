@@ -132,7 +132,7 @@ const Home = ({ navigation }) => {
 
     function onSelectCategory(category) {
         //filter restaurant
-        let restaurantList = restaurantData.filter(a => a.categories.includes(category.id))
+        let restaurantList = dummyData.restaurantData.filter(a => a.categories.includes(category.id))
 
         setRestaurants(restaurantList)
 
