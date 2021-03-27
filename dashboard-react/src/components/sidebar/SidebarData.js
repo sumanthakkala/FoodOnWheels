@@ -1,5 +1,7 @@
 import React from 'react'
-import { MdDashboard, MdStore, MdViewList } from 'react-icons/md'
+import { MdDashboard, MdStore } from 'react-icons/md'
+import { FaClipboardList, FaBraille } from "react-icons/fa";
+
 
 export const SidebarData = [
     {
@@ -14,7 +16,12 @@ export const SidebarData = [
     },
     {
         title: "Orders",
-        icon: <MdViewList />,
+        icon: <FaClipboardList />,
         link: "/orders"
+    },
+    {
+        title: "Categories",
+        icon: <FaBraille />,
+        link: "/categories"
     }
 ]

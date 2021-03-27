@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
 import Dashboard from './pages/dashboard/Dashboard'
 import Orders from './pages/orders/Orders'
 import Restaurants from './pages/restaurants/Restaurants'
+import Categories from './pages/categories/Categories'
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
           <Route path='/' exact component={Dashboard} />
           <Route path='/orders' component={Orders} />
           <Route path='/restaurants' component={Restaurants} />
+          <Route path='/categories' component={Categories} />
         </Switch>
       </div>
 
