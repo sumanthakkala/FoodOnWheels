@@ -29,6 +29,7 @@
   color: white;
   height: 100%;
   align-items: center;
+  text-decoration: none !important;
 }
 
 .sidebarRow:hover {
