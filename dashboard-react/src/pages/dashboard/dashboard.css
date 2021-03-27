@@ -34,10 +34,6 @@
   margin-bottom: 10px;
 }
 
-.table {
-  minwidth: 700;
-}
-
 .tableCell {
   padding: 15px !important;
 }
@@ -59,10 +55,6 @@
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-}
-
-tr:nth-child(even) {
-  /* background-color: #f2f2f2; */
 }
 
 .recentOrdersContainer p {
