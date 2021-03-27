@@ -1,7 +1,16 @@
 .sidebar {
   height: 100%;
   width: 15vw;
-  background-color: #fc6d3f;
+  /* background-color: #fc6d3f; */
+  background-image: linear-gradient(
+    to right bottom,
+    #fc6d3f,
+    #e75371,
+    #b65390,
+    #775894,
+    #42547d,
+    #2f4858
+  );
 }
 
 .sidebarList {
