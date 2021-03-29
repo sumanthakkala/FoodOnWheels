@@ -4,3 +4,83 @@
     "Lucida Sans", Arial, sans-serif;
   overflow: auto;
 }
+
+.addCategoryCard {
+  border-radius: 10px;
+  /* background-image: linear-gradient(
+    to right top,
+    #051937,
+    #004d7a,
+    #008793,
+    #00bf72,
+    #a8eb12
+  ); */
+  color: white;
+  width: 300px;
+  padding: 10px;
+  flex-direction: row;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  margin-bottom: 20px;
+}
+
+.categoryCard {
+  border-radius: 10px;
+  color: white;
+  width: 300px;
+  padding: 10px;
+  flex-direction: row;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  margin-bottom: 20px;
+}
+
+.categoryAvatar {
+  width: 100px !important;
+  height: 100px !important;
+}
+
+.categoryNameText {
+  font-size: large;
+  color: black;
+}
+
+.input {
+  display: none;
+}
+
+.categoriesContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  flex: 1;
+  flex-flow: wrap;
+  padding: 30px;
+}
+.deleteCategory {
+  color: black;
+  flex-direction: column;
+  justify-content: start;
+  height: 100%;
+}
+
+.deleteCategory svg {
+  visibility: hidden;
+  cursor: pointer;
+}
+
+.categoryCard:hover svg {
+  visibility: visible;
+}
+
+.addCategory {
+  color: black;
+}
+
+.addCategory svg {
+  cursor: pointer;
+}

@@ -4,3 +4,37 @@
     "Lucida Sans", Arial, sans-serif;
   overflow: auto;
 }
+
+.formControl {
+  flex: 1;
+  width: 200px;
+  padding: 0px 20px !important;
+}
+
+.filtersContainer {
+  padding: 10px 20px;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  margin: 20px;
+}
+
+.filtersContainer p {
+  font-size: large;
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+    "Lucida Sans", Arial, sans-serif;
+}
+
+.ordersContainer {
+  padding: 10px 20px;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  margin: 20px;
+}
+
+.ordersContainer p {
+  font-size: large;
+}
+
+.tableheaderCell {
+  padding: 15px !important;
+  background-color: #2f4858;
+  color: white !important;
+}
