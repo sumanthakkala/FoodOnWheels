@@ -4,3 +4,92 @@
     "Lucida Sans", Arial, sans-serif;
   overflow: auto;
 }
+
+.restaurantsCard {
+  margin: 20px;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  padding: 10px 20px;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.row p {
+  font-size: large;
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+    "Lucida Sans", Arial, sans-serif;
+}
+
+.restaurantImageDisplay {
+  width: 350px;
+  border-radius: 30px;
+  height: 200px;
+  object-fit: cover;
+}
+
+.restaurantImageContainer {
+  display: grid;
+  position: relative;
+}
+.restaurantImageContainer > * {
+  grid-column: 1;
+  grid-row: 1;
+}
+.restaurantImageContainer span {
+  position: absolute;
+  bottom: 0;
+  width: 100px;
+  background-color: white;
+  color: black;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  border-top-right-radius: 30px;
+  border-bottom-left-radius: 30px;
+}
+
+.restaurantName {
+  font-size: large;
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+    "Lucida Sans", Arial, sans-serif;
+  margin-top: 10px;
+}
+
+.restaurantsCardsListContainer {
+  display: flex;
+  flex-flow: wrap;
+  padding: 20px;
+}
+
+.restaurantCard {
+  margin: 10px;
+}
+
+.restaurantCardHoverOverlay {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  visibility: hidden;
+}
+.restaurantImageContainer:hover .restaurantCardHoverOverlay {
+  visibility: visible;
+}
+
+.restaurantImageContainer:hover .restaurantImageDisplay {
+  opacity: 0.25;
+}
+
+.restaurantCardHoverOverlay > * {
+  opacity: 100%;
+  padding: 20px;
+  cursor: pointer;
+}

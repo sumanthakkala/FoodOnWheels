@@ -1,10 +1,70 @@
 import React from 'react'
 import './restaurants.css'
+import { NavLink } from 'react-router-dom'
+
+import * as dummyData from '../../data/dummyData'
+import logo from '../../assets/images/burger-restaurant.jpg'; // with import
+
+import EditIcon from '@material-ui/icons/Edit';
+import VisibilityIcon from '@material-ui/icons/Visibility';
+import DeleteIcon from '@material-ui/icons/Delete';
+
+
 
 function Restaurants() {
+
+
+
+    function getRestaurantsCards() {
+        return (
+            <div className="restaurantsCardsListContainer">
+                {
+                    dummyData.restaurantData.map((item) => {
+                        return (
+
+                            <div className="restaurantCard">
+                                <div className="restaurantImageContainer">
+                                    <img src={logo} className="restaurantImageDisplay" />
+                                    <span>
+                                        30 - 35 min
+                                    </span>
+
+                                    <div className="restaurantCardHoverOverlay">
+                                        <EditIcon />
+                                        <VisibilityIcon />
+                                        <DeleteIcon />
+
+                                    </div>
+                                </div>
+                                <div className="restaurantName">
+                                    {item.name}
+                                </div>
+
+
+
+                            </div>
+                        )
+                    })
+                }
+            </div>
+        )
+    }
+
+
+
+
     return (
         <div className="container">
-            Restaurants
+            <div className="restaurantsCard">
+                <div className="row">
+                    <p>
+                        Restaurants
+                    </p>
+                    <NavLink to="" className="button">Add New</NavLink>
+                </div>
+                {getRestaurantsCards()}
+            </div>
+
         </div>
     )
 }
