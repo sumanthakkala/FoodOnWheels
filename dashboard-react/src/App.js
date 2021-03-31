@@ -5,6 +5,8 @@ import Dashboard from './pages/dashboard/Dashboard'
 import Orders from './pages/orders/Orders'
 import Restaurants from './pages/restaurants/Restaurants'
 import Categories from './pages/categories/Categories'
+import AddRestaurant from './pages/addRestaurant/AddRestaurant'
+import ViewRestaurant from './pages/viewRestaurant/ViewRestaurant'
 
 function App() {
   return (
@@ -14,7 +16,9 @@ function App() {
         <Switch>
           <Route path='/' exact component={Dashboard} />
           <Route path='/orders' component={Orders} />
-          <Route path='/restaurants' component={Restaurants} />
+          <Route path='/restaurants' exact component={Restaurants} />
+          <Route path='/restaurants/add' component={AddRestaurant} />
+          <Route path='/restaurants/view' component={ViewRestaurant} />
           <Route path='/categories' component={Categories} />
         </Switch>
       </div>

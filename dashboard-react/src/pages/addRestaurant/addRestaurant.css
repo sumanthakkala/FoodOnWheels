@@ -1,0 +1,36 @@
+.container {
+  flex: 1;
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+    "Lucida Sans", Arial, sans-serif;
+  overflow: auto;
+}
+
+.addRestaurantSection {
+  margin: 20px;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  padding: 10px 20px;
+}
+
+.selectDelivaryTime {
+  width: 100%;
+}
+
+.addRestaurantForm {
+  display: flex;
+  flex-direction: column;
+}
+
+.formItem {
+  width: 100%;
+  margin-top: 10px;
+}
+
+.button {
+  background-color: #2f4858 !important;
+  color: white !important;
+  margin-right: 20px !important;
+}
+.formActionsDiv {
+  display: flex;
+  justify-content: flex-end;
+}

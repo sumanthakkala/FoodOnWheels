@@ -31,7 +31,10 @@ function Restaurants() {
 
                                     <div className="restaurantCardHoverOverlay">
                                         <EditIcon />
-                                        <VisibilityIcon />
+                                        <NavLink to="/restaurants/view" className="hoverBtn">
+                                            <VisibilityIcon />
+                                        </NavLink>
+
                                         <DeleteIcon />
 
                                     </div>
@@ -55,12 +58,12 @@ function Restaurants() {
 
     return (
         <div className="container">
-            <div className="restaurantsCard">
+            <div className="cardsSection">
                 <div className="row">
                     <p>
                         Restaurants
                     </p>
-                    <NavLink to="" className="button">Add New</NavLink>
+                    <NavLink to="/restaurants/add" className="button">Add New</NavLink>
                 </div>
                 {getRestaurantsCards()}
             </div>

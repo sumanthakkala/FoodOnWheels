@@ -1,0 +1,121 @@
+.container {
+  flex: 1;
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+    "Lucida Sans", Arial, sans-serif;
+  overflow: auto;
+}
+
+.addRestaurantSection {
+  margin: 20px;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  padding: 10px 20px;
+}
+
+.headerContainer {
+  padding: 0px 20px;
+}
+
+.headerInfo {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.headerInfo p {
+  font-size: 45px;
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+    "Lucida Sans", Arial, sans-serif;
+}
+.tag {
+  background-color: #fc6d3f;
+  border-radius: 20px;
+  font-size: small;
+  padding: 3px 12px;
+  color: white;
+  margin-left: 10px;
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+    "Lucida Sans", Arial, sans-serif;
+}
+
+.customOverview {
+  justify-content: flex-start !important;
+}
+
+.customOverview .overviewTile {
+  margin-right: 20px !important;
+}
+
+.menuImage {
+  width: 300px;
+  height: 150px;
+  object-fit: cover;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+
+.menuContainer {
+  padding: 20px;
+}
+
+.menuCard {
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  width: 300px;
+  margin: 15px;
+}
+
+.menuItemDetailContainer {
+  padding: 10px;
+}
+
+.itemTitle {
+  font-size: large;
+  font-weight: 500;
+  width: 100%;
+}
+
+.itemPrice {
+  color: #e75371;
+  width: 70px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: row;
+}
+
+.caloriesText {
+  color: gray;
+  display: flex;
+  align-items: center;
+}
+
+.caloriesAndPriceText {
+  display: flex;
+  align-items: center;
+}
+
+.caloriesAndPriceText span {
+  margin-right: 5px;
+}
+
+.itemDescription {
+  color: gray;
+  width: 100%;
+}
+
+.menuContainer > p {
+  font-size: 25px;
+}
+
+.menuListContainer {
+  padding: 0px 20px;
+  display: flex;
+  flex-direction: row;
+  flex-flow: wrap;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.menuCardActions {
+  display: flex;
+  justify-content: flex-end;
+}
