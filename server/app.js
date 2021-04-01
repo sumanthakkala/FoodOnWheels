@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser')
+var cors = require('cors')
 require('dotenv/config');
 
 //Routes
@@ -9,6 +10,7 @@ const categoriesRoute = require('./routes/categories')
 
 const app = express();
 app.use(bodyParser.json())
+app.use(cors())
 
 app.use('/bucket/uploads', express.static('public/uploads'))
 app.use('/api/restaurants', restaurantsRoute)
