@@ -39,7 +39,7 @@
   grid-column: 1;
   grid-row: 1;
 }
-.restaurantImageContainer span {
+.restaurantImageContainer > span {
   position: absolute;
   bottom: 0;
   width: 100px;

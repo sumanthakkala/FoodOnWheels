@@ -8,25 +8,56 @@ import logo from '../../assets/images/burger-restaurant.jpg'; // with import
 import EditIcon from '@material-ui/icons/Edit';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import DeleteIcon from '@material-ui/icons/Delete';
-
+import axios from 'axios';
+import { IconButton } from '@material-ui/core';
 
 
 function Restaurants() {
 
+
+    const [fetchedRestaurants, setFetchedRestaurants] = React.useState([])
+
+    React.useEffect(() => {
+        axios.get(`http://localhost:5000/api/restaurants`)
+            .then(res => {
+                setFetchedRestaurants(res.data)
+            })
+    }, [])
+
+
+    const deleteRestaurantClicked = (_id) => {
+        axios({
+            method: "delete",
+            url: 'http://localhost:5000/api/restaurants/' + _id,
+            headers: { "Content-Type": "multipart/form-data" },
+        })
+            .then(function (response) {
+                debugger
+                //handle success
+                fetchedRestaurants.splice(fetchedRestaurants.findIndex((item) => {
+                    return item._id === _id
+                }));
+                setFetchedRestaurants([...fetchedRestaurants])
+            })
+            .catch(function (response) {
+                //handle error
+                console.log(response)
+            });
+    }
 
 
     function getRestaurantsCards() {
         return (
             <div className="restaurantsCardsListContainer">
                 {
-                    dummyData.restaurantData.map((item) => {
+                    fetchedRestaurants.map((item) => {
                         return (
 
                             <div className="restaurantCard">
                                 <div className="restaurantImageContainer">
-                                    <img src={logo} className="restaurantImageDisplay" />
+                                    <img src={item.photo} className="restaurantImageDisplay" />
                                     <span>
-                                        30 - 35 min
+                                        {item.duration}
                                     </span>
 
                                     <div className="restaurantCardHoverOverlay">
@@ -35,7 +66,10 @@ function Restaurants() {
                                             <VisibilityIcon />
                                         </NavLink>
 
-                                        <DeleteIcon />
+                                        <IconButton className="hoverBtn" onClick={() => deleteRestaurantClicked(item._id)}>
+                                            <DeleteIcon />
+                                        </IconButton>
+
 
                                     </div>
                                 </div>

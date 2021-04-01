@@ -40,7 +40,11 @@ const RestaurantSchema = mongoose.Schema({
         type: String,
         required: true
     },
-    location: [locationSubSchema],
+    address: {
+        type: String,
+        required: true
+    },
+    location: { type: locationSubSchema, default: () => ({}) },
     menu: [
         {
             name: {
@@ -48,7 +52,6 @@ const RestaurantSchema = mongoose.Schema({
             },
             photo: {
                 type: String,
-                required: true
             },
             description: {
                 type: String,

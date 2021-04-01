@@ -25,7 +25,7 @@ function Categories() {
             .then(res => {
                 setFetchedCategoriesData(res.data)
             })
-    })
+    }, [])
 
     const addCategoryClicked = () => {
         if (selectedCategoryIcon == null) {
@@ -48,6 +48,7 @@ function Categories() {
             .then(function (response) {
                 //handle success
                 fetchedCategoriesData.push(response.data)
+                setFetchedCategoriesData([...fetchedCategoriesData])
                 setIsImageChanged(false)
                 setSelectedCategoryIcon(null)
                 setSelectedCategoryIconAsURL(null)
@@ -72,6 +73,7 @@ function Categories() {
                 fetchedCategoriesData.splice(fetchedCategoriesData.findIndex((item) => {
                     return item._id === _id
                 }));
+                setFetchedCategoriesData([...fetchedCategoriesData])
                 console.log(response);
             })
             .catch(function (response) {
