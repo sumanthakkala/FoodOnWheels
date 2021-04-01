@@ -61,8 +61,23 @@ function Categories() {
             });
     }
 
-    const deleteCategoryClicked = () => {
-
+    const deleteCategoryClicked = (_id) => {
+        axios({
+            method: "delete",
+            url: 'http://localhost:5000/api/categories/' + _id,
+            headers: { "Content-Type": "multipart/form-data" },
+        })
+            .then(function (response) {
+                //handle success
+                fetchedCategoriesData.splice(fetchedCategoriesData.findIndex((item) => {
+                    return item._id === _id
+                }));
+                console.log(response);
+            })
+            .catch(function (response) {
+                //handle error
+                console.log(response)
+            });
     }
 
     const handleImageChange = (e) => {
@@ -71,13 +86,8 @@ function Categories() {
         setSelectedCategoryIconAsURL(URL.createObjectURL(e.target.files[0]))
     }
 
-    const getAvatarImage = () => {
-        return
-    }
-
 
     function getCategoriesComponent() {
-        var data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
         return (
             <div className="categoriesContainer">
                 <div className="addCategoryCard">
@@ -110,7 +120,7 @@ function Categories() {
                         <Avatar className="categoryAvatar" src={item.icon}></Avatar>
                         <div className="categoryNameText">{item.name}</div>
                         <div className="deleteCategory">
-                            <IconButton onClick={deleteCategoryClicked()} style={{ color: 'black', padding: '0px' }}>
+                            <IconButton onClick={() => deleteCategoryClicked(item._id)} style={{ color: 'black', padding: '0px' }}>
                                 <Clear />
                             </IconButton>
                         </div>

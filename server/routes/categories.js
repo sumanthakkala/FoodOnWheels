@@ -34,5 +34,14 @@ router.post('/', uploadHelper, async (req, res) => {
     }
 })
 
+router.delete('/:categoryId', async (req, res) => {
+    try {
+        const removedCategory = await Category.remove({ _id: req.params.categoryId })
+    }
+    catch (err) {
+        res.json({ message: err })
+    }
+})
+
 
 module.exports = router;
