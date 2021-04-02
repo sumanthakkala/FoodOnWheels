@@ -186,6 +186,12 @@ function ViewRestaurant() {
             .then(function (response) {
                 //handle success
                 setFetchedRestaurantDetails(response.data)
+                setSelectedMenuItemImage(null)
+                setSelectedMenuItemImageAsURL(null)
+                setPrice("")
+                setCalories("")
+                setDescription("")
+                setItemName("")
                 console.log(response)
             })
             .catch(function (response) {
@@ -257,7 +263,7 @@ function ViewRestaurant() {
 
                     {fetchedRestaurantDetails?.menu?.map((item) => (
                         <div className="menuCard">
-                            <img src={logo} className="menuImage" />
+                            <img src={item.photo} className="menuImage" />
 
                             <div className="menuItemDetailContainer">
                                 <div className="row">
