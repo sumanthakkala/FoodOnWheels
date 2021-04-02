@@ -18,7 +18,7 @@ function App() {
           <Route path='/orders' component={Orders} />
           <Route path='/restaurants' exact component={Restaurants} />
           <Route path='/restaurants/add' component={AddRestaurant} />
-          <Route path='/restaurants/view' component={ViewRestaurant} />
+          <Route path='/restaurants/view/:restaurantId' component={ViewRestaurant} />
           <Route path='/categories' component={Categories} />
         </Switch>
       </div>

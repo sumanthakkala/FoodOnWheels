@@ -5,9 +5,82 @@ import { GiReceiveMoney } from "react-icons/gi";
 import logo from '../../assets/images/burger-restaurant.jpg';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
-
+import Avatar from '@material-ui/core/Avatar';
+import { IconButton } from '@material-ui/core';
+import axios from 'axios';
+import { useParams } from 'react-router';
 
 function ViewRestaurant() {
+
+    const { restaurantId } = useParams()
+
+    const [fetchedRestaurantDetails, setFetchedRestaurantDetails] = React.useState({})
+    const [fetchedCategories, setFetchedCategories] = React.useState([])
+    const [selectedMenuItemImage, setSelectedMenuItemImage] = React.useState(null);
+    const [selectedMenuItemImageAsURL, setSelectedMenuItemImageAsURL] = React.useState(null);
+    const [itemName, setItemName] = React.useState("")
+    const [calories, setCalories] = React.useState("")
+    const [price, setPrice] = React.useState("")
+    const [description, setDescription] = React.useState("")
+
+
+    React.useEffect(() => {
+        axios.get(`http://localhost:5000/api/restaurants/` + restaurantId)
+            .then(res => {
+                setFetchedRestaurantDetails(res.data)
+            })
+
+        axios.get(`http://localhost:5000/api/categories`)
+            .then(res => {
+                setFetchedCategories(res.data)
+            })
+    }, [])
+
+
+    const handleImageChange = (e) => {
+        setSelectedMenuItemImage(e.target.files[0])
+        // setIsImageChanged(true)
+        setSelectedMenuItemImageAsURL(URL.createObjectURL(e.target.files[0]))
+    }
+
+
+    function getPriceRatingTag(rating) {
+        switch (rating) {
+            case 1:
+                return (
+                    <div className="tag">
+                        Affordable
+                    </div>
+                )
+                break;
+            case 2:
+                return (
+                    <div className="tag">
+                        Fair Price
+                    </div>
+                )
+                break;
+            case 3:
+                return (
+                    <div className="tag">
+                        Expensive
+                    </div>
+                )
+                break;
+        }
+    }
+
+    function getCategoriesTags(categories) {
+        var filteredArray = fetchedCategories?.filter((categoryObj) => categories?.includes(categoryObj._id))
+
+        return filteredArray.map((item) => {
+            return (
+                <div className="tag">
+                    {item.name}
+                </div>
+            )
+        })
+    }
 
 
     function getRestaurantHeader() {
@@ -15,19 +88,11 @@ function ViewRestaurant() {
             <div className="headerContainer">
                 <div className="headerInfo">
                     <p>
-                        MrBeast Burger
+                        {fetchedRestaurantDetails.name}
                     </p>
-                    {['Burger', 'Snack'].map((item) => (
-                        <div className="tag">
-                            {item}
-                        </div>
-                    ))}
+                    {getCategoriesTags(fetchedRestaurantDetails.categories)}
 
-                    {['Affordable', 'Fair Price'].map((item) => (
-                        <div className="tag">
-                            {item}
-                        </div>
-                    ))}
+                    {getPriceRatingTag(fetchedRestaurantDetails.priceRating)}
                 </div>
 
                 <div className="overviewContainer customOverview">
@@ -56,7 +121,7 @@ function ViewRestaurant() {
                         </div>
 
                         <div>
-                            12
+                            {fetchedRestaurantDetails?.menu?.length}
                         </div>
                     </div>
 
@@ -83,10 +148,54 @@ function ViewRestaurant() {
     }
 
 
+    function getMenuImageComponent(image) {
+        if (image != null) {
+            return (
+                <img src={image} className="menuImage" />
+            )
+        }
+        else {
+            return (
+                <div className="menuImage">
+                    Add Image
+                </div>
+            )
+        }
+
+    }
+
+    const onSaveBtnClicked = () => {
+        if (selectedMenuItemImage == null || itemName == "" || calories == "" || price == "" || description == "") {
+            alert("All fields are required");
+            return
+        }
+
+        var bodyFormData = new FormData();
+        bodyFormData.append('name', itemName)
+        bodyFormData.append('image', selectedMenuItemImage)
+        bodyFormData.append('description', description)
+        bodyFormData.append('calories', calories)
+        bodyFormData.append('price', price)
+        bodyFormData.append('restaurantId', restaurantId)
+        axios({
+            method: "post",
+            url: "http://localhost:5000/api/restaurants/add/menuIitem",
+            data: bodyFormData,
+            headers: { "Content-Type": "multipart/form-data" },
+        })
+            .then(function (response) {
+                //handle success
+                setFetchedRestaurantDetails(response.data)
+                console.log(response)
+            })
+            .catch(function (response) {
+                //handle error
+                console.log(response)
+            });
+    }
 
 
     function getMenuList() {
-        var data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
         return (
             <div className="menuContainer">
                 <p>
@@ -96,31 +205,45 @@ function ViewRestaurant() {
 
 
                     <div className="menuCard">
-                        <img src={logo} className="menuImage" />
+                        <div className="menuImage">
+                            <input
+                                accept="image/*"
+                                id="contained-button-file"
+                                className="input"
+                                multiple
+                                type="file"
+                                onChange={handleImageChange}
+                            />
+                            <label htmlFor="contained-button-file">
+                                <IconButton component="span">
+                                    {getMenuImageComponent(selectedMenuItemImageAsURL)}
+                                </IconButton>
+                            </label>
+                        </div>
 
                         <div className="menuItemDetailContainer">
                             <div className="row">
                                 <div className="itemTitle">
-                                    <TextField style={{ width: "100%" }} label="Item Name" />
+                                    <TextField value={itemName} onChange={(e) => setItemName(e.target.value)} style={{ width: "100%" }} label="Item Name" />
                                 </div>
                             </div>
                             <div className="caloriesAndPriceText">
                                 <div className="itemPrice">
                                     <span>$</span>
-                                    <TextField id="standard-basic" label="Price" />
+                                    <TextField value={price} onChange={(e) => setPrice(e.target.value)} id="standard-basic" label="Price" />
                                 </div>
                                 <div className="caloriesText">
                                     <span>🔥</span>
-                                    <TextField id="standard-basic" label="Calories" />
+                                    <TextField value={calories} onChange={(e) => setCalories(e.target.value)} id="standard-basic" label="Calories" />
                                 </div>
                             </div>
 
                             <div className="itemDescription">
-                                <TextField style={{ width: "100%", marginBottom: '10px' }} label="Description" />
+                                <TextField value={description} onChange={(e) => setDescription(e.target.value)} style={{ width: "100%", marginBottom: '10px' }} label="Description" />
                             </div>
 
                             <div className="">
-                                <Button variant="contained" className="button">
+                                <Button variant="contained" className="button" onClick={() => onSaveBtnClicked()}>
                                     Save
                                 </Button>
                             </div>
@@ -132,31 +255,31 @@ function ViewRestaurant() {
 
 
 
-                    {data.map((item) => (
+                    {fetchedRestaurantDetails?.menu?.map((item) => (
                         <div className="menuCard">
                             <img src={logo} className="menuImage" />
 
                             <div className="menuItemDetailContainer">
                                 <div className="row">
                                     <div className="itemTitle">
-                                        Big Mac Burger
-                                </div>
+                                        {item.name}
+                                    </div>
 
 
                                     <div className="itemPrice">
-                                        $15.50
-                                </div>
+                                        ${item.price}
+                                    </div>
                                 </div>
                                 <div className="caloriesText">
-                                    🔥 475 cal
+                                    🔥 {item.calories} cal
                                 </div>
 
                                 <p className="itemDescription">
-                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, dolor sit amet, consectetur adipiscing
-                            </p>
+                                    {item.description}
+                                </p>
 
                                 <div className="menuCardActions">
-                                    <Button variant="contained" color='secondary' onClick={removeBtnClicked}>
+                                    <Button variant="contained" color='secondary' onClick={() => removeBtnClicked(item._id)}>
                                         Remove
                                 </Button>
                                 </div>
@@ -166,12 +289,26 @@ function ViewRestaurant() {
                     ))}
 
                 </div>
-            </div>
+            </div >
         )
     }
 
-    const removeBtnClicked = () => {
+    const removeBtnClicked = (menuItemId) => {
 
+        axios({
+            method: "delete",
+            url: 'http://localhost:5000/api/restaurants/deleteMenuItem/' + restaurantId + '/' + menuItemId,
+            // data: bodyFormData,
+            headers: { "Content-Type": "multipart/form-data" },
+        })
+            .then(function (response) {
+                console.log(response)
+                setFetchedRestaurantDetails(response.data)
+            })
+            .catch(function (response) {
+                //handle error
+                console.log(response)
+            });
     }
 
 

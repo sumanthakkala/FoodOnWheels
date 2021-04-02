@@ -62,7 +62,7 @@ function Restaurants() {
 
                                     <div className="restaurantCardHoverOverlay">
                                         <EditIcon />
-                                        <NavLink to="/restaurants/view" className="hoverBtn">
+                                        <NavLink to={"/restaurants/view/" + item._id} className="hoverBtn">
                                             <VisibilityIcon />
                                         </NavLink>
 

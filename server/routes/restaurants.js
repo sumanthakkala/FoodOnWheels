@@ -16,6 +16,17 @@ router.get('/', async (req, res) => {
     }
 });
 
+router.get('/:id', async (req, res) => {
+    try {
+        const restaurant = await Restaurant.findById(req.params.id);
+        res.json(restaurant)
+    }
+    catch (err) {
+        console.log(err)
+        res.json({ message: err });
+    }
+});
+
 router.post('/', uploadHelper, async (req, res) => {
     const restaurant = new Restaurant({
         name: req.body.name,
@@ -46,5 +57,43 @@ router.delete('/:restaurantId', async (req, res) => {
     }
 })
 
+router.post('/add/menuIitem', uploadHelper, async (req, res) => {
+    const menuItemObj = {
+        name: req.body.name,
+        photo: process.env.BUCKET_ACCESS_PATH + req.file.filename,
+        description: req.body.description,
+        calories: parseFloat(req.body.calories),
+        price: parseFloat(req.body.price)
+    }
+    console.log(menuItemObj)
+    try {
+        const result = await Restaurant.findByIdAndUpdate(
+            req.body.restaurantId,
+            { $push: { menu: menuItemObj } }
+        );
+        const updatedRestaurant = await Restaurant.findById(req.body.restaurantId)
+        res.json(updatedRestaurant)
+    }
+    catch (err) {
+        console.log(err)
+        res.json({ message: err })
+    }
+})
+
+router.delete('/deleteMenuItem/:restaurantId/:menuItemId', async (req, res) => {
+    console.log(req.params.menuItemId)
+    console.log(req.body.restaurantId)
+    try {
+        const removedRestaurant = await Restaurant.findByIdAndUpdate(
+            req.params.restaurantId,
+            { $pull: { menu: { _id: req.params.menuItemId } } }
+        );
+        const updatedRestaurant = await Restaurant.findById(req.params.restaurantId)
+        res.json(updatedRestaurant)
+    }
+    catch (err) {
+        res.json({ message: err })
+    }
+})
 
 module.exports = router;
