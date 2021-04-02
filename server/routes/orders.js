@@ -27,6 +27,17 @@ router.get('/:id', async (req, res) => {
     }
 });
 
+router.get('/restaurant/:id', async (req, res) => {
+    try {
+        const order = await Order.find({ 'restaurantId': req.params.id });
+        res.json(order)
+    }
+    catch (err) {
+        console.log(err)
+        res.json({ message: err });
+    }
+});
+
 router.post('/', async (req, res) => {
     const order = new Order({
 

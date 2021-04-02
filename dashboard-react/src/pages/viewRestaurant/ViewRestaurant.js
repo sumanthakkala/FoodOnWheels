@@ -22,12 +22,22 @@ function ViewRestaurant() {
     const [calories, setCalories] = React.useState("")
     const [price, setPrice] = React.useState("")
     const [description, setDescription] = React.useState("")
-
+    const [fetchedOrders, setFetchedOrders] = React.useState([])
+    const [totalRevenue, setTotlaRevenue] = React.useState(0)
 
     React.useEffect(() => {
         axios.get(`http://localhost:5000/api/restaurants/` + restaurantId)
             .then(res => {
                 setFetchedRestaurantDetails(res.data)
+
+                axios.get(`http://192.168.2.19:5000/api/orders/restaurant/` + res.data._id)
+                    .then(res => {
+                        console.log(res.data)
+                        // setOrders(res.data)
+                        setFetchedOrders(res.data)
+                        var total = res.data?.reduce((a, b) => a + (b.orderTotal || 0), 0)
+                        setTotlaRevenue(total)
+                    })
             })
 
         axios.get(`http://localhost:5000/api/categories`)
@@ -35,6 +45,7 @@ function ViewRestaurant() {
                 setFetchedCategories(res.data)
             })
     }, [])
+
 
 
     const handleImageChange = (e) => {
@@ -107,7 +118,7 @@ function ViewRestaurant() {
                         </div>
 
                         <div>
-                            $1621.89
+                            ${totalRevenue}
                         </div>
                     </div>
 
@@ -138,7 +149,7 @@ function ViewRestaurant() {
                         </div>
 
                         <div>
-                            504
+                            {fetchedOrders.length}
                         </div>
                     </div>
                 </div>
