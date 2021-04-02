@@ -12,7 +12,7 @@ import { icons, COLORS, SIZES, FONTS } from '../constants'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useFocusEffect } from '@react-navigation/native';
 import * as dummyData from '../data/dummyData';
-
+import axios from 'axios';
 
 const Profile = ({ navigation }) => {
 
@@ -23,15 +23,19 @@ const Profile = ({ navigation }) => {
     );
 
 
+    // React.useEffect(() => {
+    //     if (!isDataFetched) {
+    //         loadData();
+    //     }
+    //     return () => {
+    //         // Cleanup
+    //         // setIsDataFetched(false);
+    //     }
+    // })
+
     React.useEffect(() => {
-        if (!isDataFetched) {
-            loadData();
-        }
-        return () => {
-            // Cleanup
-            // setIsDataFetched(false);
-        }
-    })
+        loadData()
+    }, [])
 
     const [orders, setOrders] = React.useState([]);
     const [isDataFetched, setIsDataFetched] = React.useState(false);
@@ -39,38 +43,50 @@ const Profile = ({ navigation }) => {
     const [currentLocation, setCurrentLocation] = React.useState(dummyData.initialCurrentLocation);
 
     function loadData() {
-        AsyncStorage.getItem('orders').then((response) => {
-            response != null ? setOrders(JSON.parse(response)) : setOrders([])
+        // AsyncStorage.getItem('orders').then((response) => {
+        //     response != null ? setOrders(JSON.parse(response)) : setOrders([])
 
-            AsyncStorage.getItem('restaurants').then((response) => {
-                response != null ? setRestaurants(JSON.parse(response)) : setRestaurants([])
-                setIsDataFetched(true);
+        //     AsyncStorage.getItem('restaurants').then((response) => {
+        //         response != null ? setRestaurants(JSON.parse(response)) : setRestaurants([])
+        //         setIsDataFetched(true);
+        //     })
+        // })
+
+        axios.get(`http://192.168.2.19:5000/api/orders`)
+            .then(res => {
+                console.log(res.data)
+                setOrders(res.data)
             })
-        })
+
+        axios.get(`http://192.168.2.19:5000/api/restaurants`)
+            .then(res => {
+                console.log(res.data)
+                setRestaurants(res.data)
+            })
     }
 
     function getBasketItemCount(orderid) {
 
         let orderObj = orders.filter(order => {
-            return order.orderId === orderid;
+            return order._id === orderid;
         })
-        let itemCount = orderObj[0]?.orderedMenu.reduce((a, b) => a + (b.qty || 0), 0)
+        let itemCount = orderObj[0]?.orderedMenu?.reduce((a, b) => a + (b.qty || 0), 0)
 
         return itemCount
     }
 
     function sumOrder(orderid) {
         let orderObj = orders.filter(order => {
-            return order.orderId === orderid;
+            return order._id === orderid;
         })
-        let total = orderObj[0]?.orderedMenu.reduce((a, b) => a + (b.total || 0), 0)
+        let total = orderObj[0]?.orderedMenu?.reduce((a, b) => a + (b.total || 0), 0)
 
         return total.toFixed(2)
     }
 
     function getRestaurantById(rid) {
-        let restaurantObj = restaurants.filter(obj => {
-            return obj.id === rid;
+        let restaurantObj = restaurants?.filter(obj => {
+            return obj._id === rid;
         })
         return restaurantObj[0];
     }
@@ -107,11 +123,11 @@ const Profile = ({ navigation }) => {
                     </Text>
 
                     <Text style={{ color: COLORS.darkgray }}>
-                        {new Date(item.createdAt).toDateString()}
+                        {new Date(item.dateCreated).toDateString()}
                     </Text>
 
                     <Text style={{ color: COLORS.darkgray }}>
-                        {getBasketItemCount(item.orderId)} items -- ${sumOrder(item.orderId)}
+                        {getBasketItemCount(item._id)} items -- ${sumOrder(item._id)}
                     </Text>
                 </View>
 
@@ -143,7 +159,7 @@ const Profile = ({ navigation }) => {
                 <Text style={{ ...FONTS.body1, fontSize: 25, fontWeight: '900', paddingBottom: 10 }}>Orders</Text>
                 <FlatList
                     data={orders}
-                    keyExtractor={item => `${item.orderId}`}
+                    keyExtractor={item => `${item._id}`}
                     renderItem={renderItem}
                     contentContainerStyle={{
                         // paddingHorizontal: SIZES.padding * 2,

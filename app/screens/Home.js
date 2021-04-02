@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { icons, images, SIZES, COLORS, FONTS } from '../constants'
 import * as dummyData from '../data/dummyData'
+import axios from 'axios';
 
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
@@ -44,28 +45,46 @@ const Home = ({ navigation }) => {
     //     })
     // })
 
-    React.useEffect(() => {
-        if (!isDataFetched) {
-            AsyncStorage.getItem('categories').then((response) => {
-                response != null ? setCategories(JSON.parse(response)) : setCategories([])
+    // React.useEffect(() => {
+    //     if (!isDataFetched) {
+    //         AsyncStorage.getItem('categories').then((response) => {
+    //             response != null ? setCategories(JSON.parse(response)) : setCategories([])
 
-                AsyncStorage.getItem('restaurants').then((response) => {
-                    response != null ? setRestaurants(JSON.parse(response)) : setRestaurants([])
-                    setIsDataFetched(true);
-                })
+    //             AsyncStorage.getItem('restaurants').then((response) => {
+    //                 response != null ? setRestaurants(JSON.parse(response)) : setRestaurants([])
+    //                 setIsDataFetched(true);
+    //             })
+    //         })
+    //     }
+    //     return () => {
+    //         // Cleanup
+    //         // setIsDataFetched(false);
+    //     }
+    // })
+
+    React.useEffect(() => {
+        axios.get(`http://192.168.2.19:5000/api/categories`)
+            .then(res => {
+                console.log(res.data)
+                setCategories(res.data)
             })
-        }
-        return () => {
-            // Cleanup
-            // setIsDataFetched(false);
-        }
-    })
+    }, [])
+
+    React.useEffect(() => {
+        axios.get(`http://192.168.2.19:5000/api/restaurants`)
+            .then(res => {
+                console.log(res.data)
+                setRestaurants(res.data)
+                setRestaurantsDataCopy(res.data)
+            })
+    }, [])
 
 
 
     const [categories, setCategories] = React.useState([])
     const [selectedCategory, setSelectedCategory] = React.useState(null)
     const [restaurants, setRestaurants] = React.useState([])
+    const [restaurantsDataCopy, setRestaurantsDataCopy] = React.useState([])
     const [currentLocation, setCurrentLocation] = React.useState(dummyData.initialCurrentLocation)
     const [isDataFetched, setIsDataFetched] = React.useState(false);
 
@@ -132,8 +151,9 @@ const Home = ({ navigation }) => {
 
     function onSelectCategory(category) {
         //filter restaurant
-        let restaurantList = dummyData.restaurantData.filter(a => a.categories.includes(category.id))
+        // let restaurantList = dummyData.restaurantData.filter(a => a.categories.includes(category.id))
 
+        let restaurantList = restaurantsDataCopy.filter(a => a.categories.includes(category._id))
         setRestaurants(restaurantList)
 
         setSelectedCategory(category)
@@ -146,7 +166,7 @@ const Home = ({ navigation }) => {
                     style={{
                         padding: SIZES.padding,
                         paddingBottom: SIZES.padding * 2,
-                        backgroundColor: (selectedCategory?.id == item.id) ? COLORS.primary : COLORS.white,
+                        backgroundColor: (selectedCategory?._id == item._id) ? COLORS.primary : COLORS.white,
                         borderRadius: SIZES.radius,
                         alignItems: "center",
                         justifyContent: "center",
@@ -162,11 +182,11 @@ const Home = ({ navigation }) => {
                             borderRadius: 25,
                             alignItems: "center",
                             justifyContent: "center",
-                            backgroundColor: (selectedCategory?.id == item.id) ? COLORS.white : COLORS.lightGray
+                            backgroundColor: (selectedCategory?._id == item._id) ? COLORS.white : COLORS.lightGray
                         }}
                     >
                         <Image
-                            source={item.icon}
+                            source={{ uri: item.icon }}
                             resizeMode="contain"
                             style={{
                                 width: 30,
@@ -178,7 +198,7 @@ const Home = ({ navigation }) => {
                     <Text
                         style={{
                             marginTop: SIZES.padding,
-                            color: (selectedCategory?.id == item.id) ? COLORS.white : COLORS.black,
+                            color: (selectedCategory?._id == item._id) ? COLORS.white : COLORS.black,
                             ...FONTS.body5
                         }}
                     >
@@ -197,7 +217,7 @@ const Home = ({ navigation }) => {
                     data={categories}
                     horizontal
                     showsHorizontalScrollIndicator={false}
-                    keyExtractor={item => `${item.id}`}
+                    keyExtractor={item => `${item._id}`}
                     renderItem={renderItem}
                     contentContainerStyle={{ paddingVertical: SIZES.padding * 2 }}
                 />
@@ -226,7 +246,7 @@ const Home = ({ navigation }) => {
                     }}
                 >
                     <Image
-                        source={item.photo}
+                        source={{ uri: item.photo }}
                         resizeMode="cover"
                         style={{
                             width: "100%",
@@ -315,7 +335,7 @@ const Home = ({ navigation }) => {
         return (
             <FlatList
                 data={restaurants}
-                keyExtractor={item => `${item.id}`}
+                keyExtractor={item => `${item._id}`}
                 renderItem={renderItem}
                 contentContainerStyle={{
                     paddingHorizontal: SIZES.padding * 2,
@@ -329,7 +349,7 @@ const Home = ({ navigation }) => {
 
 
     function getCategoryNameById(id) {
-        let category = categories.filter(a => a.id == id)
+        let category = categories.filter(a => a._id == id)
 
         if (category.length > 0)
             return category[0].name

@@ -16,6 +16,7 @@ import { icons, COLORS, SIZES, FONTS } from '../constants'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import UUIDGenerator from 'react-native-uuid-generator';
 import RBSheet from "react-native-raw-bottom-sheet";
+import axios from 'axios';
 
 const Restaurant = ({ route, navigation }) => {
 
@@ -25,8 +26,10 @@ const Restaurant = ({ route, navigation }) => {
     const [orderItems, setOrderItems] = React.useState([]);
     const [orderObject, setOrderObject] = React.useState({
         orderId: '',
-        restaurantId: route.params.restaurantObj.id,
+        restaurantId: route.params.restaurantObj._id,
+        orderTotal: 0,
         createdAt: '',
+        status: 'placed',
         orderedMenu: []
     });
     const refRBSheet = React.useRef();
@@ -47,7 +50,7 @@ const Restaurant = ({ route, navigation }) => {
     function editOrder(action, menuId, price) {
         let orderObj = orderObject
         let orderList = orderObj.orderedMenu.slice()
-        let item = orderObj.orderedMenu.filter(a => a.menuId == menuId)
+        let item = orderObj.orderedMenu.filter(a => a.menuItemId == menuId)
 
         if (action == "+") {
             if (item.length > 0) {
@@ -56,7 +59,7 @@ const Restaurant = ({ route, navigation }) => {
                 item[0].total = item[0].qty * price
             } else {
                 const newItem = {
-                    menuId: menuId,
+                    menuItemId: menuId,
                     qty: 1,
                     price: price,
                     total: price
@@ -92,7 +95,7 @@ const Restaurant = ({ route, navigation }) => {
     }
 
     function getOrderQty(menuId) {
-        let orderItem = orderItems.filter(a => a.menuId == menuId)
+        let orderItem = orderItems.filter(a => a.menuItemId == menuId)
 
         if (orderItem.length > 0) {
             return orderItem[0].qty
@@ -109,7 +112,7 @@ const Restaurant = ({ route, navigation }) => {
 
     function sumOrder() {
         let total = orderItems.reduce((a, b) => a + (b.total || 0), 0)
-
+        orderObject.orderTotal = total
         return total.toFixed(2)
     }
 
@@ -197,7 +200,7 @@ const Restaurant = ({ route, navigation }) => {
                             <View style={{ height: SIZES.height * 0.35 }}>
                                 {/* Food Image */}
                                 <Image
-                                    source={item.photo}
+                                    source={{ uri: item.photo }}
                                     resizeMode="cover"
                                     style={{
                                         width: SIZES.width,
@@ -225,7 +228,7 @@ const Restaurant = ({ route, navigation }) => {
                                             borderTopLeftRadius: 25,
                                             borderBottomLeftRadius: 25
                                         }}
-                                        onPress={() => editOrder("-", item.menuId, item.price)}
+                                        onPress={() => editOrder("-", item._id, item.price)}
                                     >
                                         <Text style={{ ...FONTS.body1 }}>-</Text>
                                     </TouchableOpacity>
@@ -238,7 +241,7 @@ const Restaurant = ({ route, navigation }) => {
                                             justifyContent: 'center'
                                         }}
                                     >
-                                        <Text style={{ ...FONTS.h2 }}>{getOrderQty(item.menuId)}</Text>
+                                        <Text style={{ ...FONTS.h2 }}>{getOrderQty(item._id)}</Text>
                                     </View>
 
                                     <TouchableOpacity
@@ -250,7 +253,7 @@ const Restaurant = ({ route, navigation }) => {
                                             borderTopRightRadius: 25,
                                             borderBottomRightRadius: 25
                                         }}
-                                        onPress={() => editOrder("+", item.menuId, item.price)}
+                                        onPress={() => editOrder("+", item._id, item.price)}
                                     >
                                         <Text style={{ ...FONTS.body1 }}>+</Text>
                                     </TouchableOpacity>
@@ -454,7 +457,7 @@ const Restaurant = ({ route, navigation }) => {
     }
 
     function getMenuItemByMenuId(menuid) {
-        let item = restaurant.menu.filter(a => a.menuId == menuid)
+        let item = restaurant.menu.filter(a => a._id == menuid)
         if (item.length > 0) {
             return item[0];
         }
@@ -489,7 +492,7 @@ const Restaurant = ({ route, navigation }) => {
                     <View style={{ paddingHorizontal: SIZES.padding * 1.5 }}>
 
                         <Text style={{ fontSize: SIZES.body2 }}>
-                            {truncateString(getMenuItemByMenuId(item.menuId).name)}
+                            {truncateString(getMenuItemByMenuId(item.menuItemId).name)}
                         </Text>
 
                         {/* Calories */}
@@ -512,7 +515,7 @@ const Restaurant = ({ route, navigation }) => {
 
                             <Text style={{
                                 ...FONTS.body4, color: COLORS.darkgray
-                            }}>{getMenuItemByMenuId(item.menuId).calories.toFixed(2)} cal</Text>
+                            }}>{getMenuItemByMenuId(item.menuItemId).calories.toFixed(2)} cal</Text>
                         </View>
                     </View>
 
@@ -558,7 +561,7 @@ const Restaurant = ({ route, navigation }) => {
 
                     <FlatList
                         data={orderObject.orderedMenu}
-                        keyExtractor={item => `${item.menuId}`}
+                        keyExtractor={item => `${item.menuItemId}`}
                         renderItem={renderItem}
                         contentContainerStyle={{
                             // paddingHorizontal: SIZES.padding * 2,
@@ -598,32 +601,74 @@ const Restaurant = ({ route, navigation }) => {
     function placeOrder() {
         console.log(orderObject)
         if (orderObject.orderedMenu.length > 0) {
-            AsyncStorage.getItem('orders').then((response) => {
-                let orders = response != null ? JSON.parse(response) : [];
-                console.log(orders)
-                //orderObject.orderId = uuid.v1();
-                UUIDGenerator.getRandomUUID().then((uuid) => {
-                    orderObject.orderId = uuid;
-                    orderObject.createdAt = new Date().toISOString();
-                    orders.push(orderObject);
-                    console.log(orders)
-                    AsyncStorage.setItem('orders', JSON.stringify(orders)).then(() => {
-                        Alert.alert(
-                            "Thank you for placing the order.",
-                            "My Alert Msg",
-                            [
-                                {
-                                    text: "View Orders", onPress: () => {
-                                        navigation.navigate("Home", {
-                                            screen: 'Profile'
-                                        })
-                                    }
-                                }
-                            ]
-                        );
-                    })
-                })
+
+
+
+            // AsyncStorage.getItem('orders').then((response) => {
+            //     let orders = response != null ? JSON.parse(response) : [];
+            //     console.log(orders)
+            //     //orderObject.orderId = uuid.v1();
+            //     UUIDGenerator.getRandomUUID().then((uuid) => {
+            //         orderObject.orderId = uuid;
+            //         orderObject.createdAt = new Date().toISOString();
+            //         orders.push(orderObject);
+            //         console.log(orders)
+            //         AsyncStorage.setItem('orders', JSON.stringify(orders)).then(() => {
+            //             Alert.alert(
+            //                 "Thank you for placing the order.",
+            //                 "My Alert Msg",
+            //                 [
+            //                     {
+            //                         text: "View Orders", onPress: () => {
+            //                             navigation.navigate("Home", {
+            //                                 screen: 'Profile'
+            //                             })
+            //                         }
+            //                     }
+            //                 ]
+            //             );
+            //         })
+            //     })
+            // })
+
+
+            var data = {
+                restaurantId: orderObject.restaurantId,
+                orderTotal: orderObject.orderTotal,
+                status: orderObject.status,
+                duration: restaurant.duration,
+                address: currentLocation?.locationName,
+                orderedMenu: orderObject.orderedMenu
+            }
+
+
+
+            axios.post('http://192.168.2.19:5000/api/orders', JSON.stringify(data), {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
             })
+                .then(function (response) {
+                    //handle success
+                    Alert.alert(
+                        "Thank you for placing the order.",
+                        "My Alert Msg",
+                        [
+                            {
+                                text: "View Orders", onPress: () => {
+                                    navigation.navigate("Home", {
+                                        screen: 'Profile'
+                                    })
+                                }
+                            }
+                        ]
+                    );
+                })
+                .catch(function (response) {
+                    //handle error
+                    console.log(response)
+                });
+
         }
         else {
             alert("Please select items")

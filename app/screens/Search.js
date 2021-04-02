@@ -11,6 +11,7 @@ import {
 import { SearchBar } from 'react-native-elements'
 import { icons, COLORS, SIZES, FONTS } from '../constants'
 import * as dummyData from '../data/dummyData'
+import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const styles = StyleSheet.create({
@@ -33,29 +34,47 @@ const styles = StyleSheet.create({
 
 const Search = ({ navigation }) => {
 
+    // React.useEffect(() => {
+    //     if (!isDataFetched) {
+    //         AsyncStorage.getItem('categories').then((response) => {
+    //             response != null ? setCategories(JSON.parse(response)) : setCategories([])
+
+    //             AsyncStorage.getItem('restaurants').then((response) => {
+    //                 response != null ? setRestaurants(JSON.parse(response)) : setRestaurants([])
+    //                 setIsDataFetched(true);
+    //             })
+    //         })
+    //     }
+
+    //     return () => {
+    //         // Cleanup
+    //         // setIsDataFetched(false);
+    //     }
+    // })
+
     React.useEffect(() => {
-        if (!isDataFetched) {
-            AsyncStorage.getItem('categories').then((response) => {
-                response != null ? setCategories(JSON.parse(response)) : setCategories([])
-
-                AsyncStorage.getItem('restaurants').then((response) => {
-                    response != null ? setRestaurants(JSON.parse(response)) : setRestaurants([])
-                    setIsDataFetched(true);
-                })
+        axios.get(`http://192.168.2.19:5000/api/categories`)
+            .then(res => {
+                console.log(res.data)
+                setCategories(res.data)
             })
-        }
+    }, [])
 
-        return () => {
-            // Cleanup
-            // setIsDataFetched(false);
-        }
-    })
+    React.useEffect(() => {
+        axios.get(`http://192.168.2.19:5000/api/restaurants`)
+            .then(res => {
+                console.log(res.data)
+                setRestaurants(res.data)
+                setRestaurantsDataCopy(res.data)
+            })
+    }, [])
 
     const [searchText, setSearchText] = React.useState("");
     const [filteredRestaurants, setFilteredRestaurants] = React.useState([]);
     // console.log(dummyData.restaurantData)
     const [categories, setCategories] = React.useState([])
     const [restaurants, setRestaurants] = React.useState([])
+    const [restaurantsDataCopy, setRestaurantsDataCopy] = React.useState([])
     const [currentLocation, setCurrentLocation] = React.useState(dummyData.initialCurrentLocation)
     const [isDataFetched, setIsDataFetched] = React.useState(false);
 
@@ -64,7 +83,7 @@ const Search = ({ navigation }) => {
         setSearchText(text)
 
         if (text.length != 0) {
-            let restaurantList = dummyData.restaurantData.filter(a => a.name.toLowerCase().includes(text.toLowerCase()))
+            let restaurantList = restaurantsDataCopy.filter(a => a.name.toLowerCase().includes(text.toLowerCase()))
             setFilteredRestaurants(restaurantList)
         }
         else {
@@ -74,7 +93,7 @@ const Search = ({ navigation }) => {
 
 
     function getCategoryNameById(id) {
-        let category = categories.filter(a => a.id == id)
+        let category = categories.filter(a => a._id == id)
 
         if (category.length > 0)
             return category[0].name
@@ -105,7 +124,7 @@ const Search = ({ navigation }) => {
                     }}
                 >
                     <Image
-                        source={item.photo}
+                        source={{ uri: item.photo }}
                         resizeMode="cover"
                         style={{
                             width: "100%",
@@ -214,7 +233,7 @@ const Search = ({ navigation }) => {
         return (
             <FlatList
                 data={filteredRestaurants}
-                keyExtractor={item => `${item.id}`}
+                keyExtractor={item => `${item._id}`}
                 renderItem={renderItem}
                 contentContainerStyle={{
                     paddingHorizontal: SIZES.padding * 2,
