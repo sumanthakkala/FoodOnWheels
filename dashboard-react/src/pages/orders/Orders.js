@@ -26,7 +26,7 @@ import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
 import KeyboardArrowDown from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUp from '@material-ui/icons/KeyboardArrowUp';
-
+import axios from 'axios';
 
 
 
@@ -46,6 +46,29 @@ function Orders() {
     // const classes = useStyle();
     const [orderStatusFilter, setOrderStatusFilter] = React.useState(0);
     const [orderTimelineFilter, setOrderTimelineFilter] = React.useState(0);
+    const [fetchedOrders, setFetchedOrders] = React.useState([])
+    const [fetchedRestaurants, setFetchedRestaurants] = React.useState([])
+
+
+    React.useEffect(() => {
+        axios.get(`http://192.168.2.19:5000/api/orders`)
+            .then(res => {
+                console.log(res.data)
+                // setOrders(res.data)
+                setFetchedOrders(res.data.reverse())
+            })
+    }, [])
+
+    React.useEffect(() => {
+        axios.get(`http://localhost:5000/api/restaurants`)
+            .then(res => {
+                setFetchedRestaurants(res.data)
+            })
+    }, [])
+
+
+
+
     const handleStatusChange = (event) => {
         setOrderStatusFilter(event.target.value);
     };
@@ -130,8 +153,16 @@ function Orders() {
         };
     }
 
+    function getRestaurantNameById(id) {
+        return fetchedRestaurants?.find(item => item._id === id)?.name
+    }
+
+    function getMenuItemNameById(restaurantId, menuItemId) {
+        return fetchedRestaurants?.find(restaurant => restaurant._id === restaurantId)?.menu.find(item => item._id === menuItemId).name
+    }
+
     function Row(props) {
-        const { row } = props;
+        const { order } = props;
         const [open, setOpen] = React.useState(false);
         // const classes = useRowStyles();
 
@@ -144,39 +175,39 @@ function Orders() {
                         </IconButton>
                     </TableCell>
                     <TableCell component="th" scope="row">
-                        {row.name}
+                        {order._id}
                     </TableCell>
-                    <TableCell align="right">{row.calories}</TableCell>
-                    <TableCell align="right">{row.fat}</TableCell>
-                    <TableCell align="right">{row.carbs}</TableCell>
-                    <TableCell align="right">{row.protein}</TableCell>
+                    <TableCell align="right">{getRestaurantNameById(order.restaurantId)}</TableCell>
+                    <TableCell align="right">{order.address}</TableCell>
+                    <TableCell align="right" style={{ color: 'green', fontWeight: 'bold' }}>${order.orderTotal}</TableCell>
+                    <TableCell align="right">{order.status}</TableCell>
                 </TableRow>
                 <TableRow>
                     <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
                         <Collapse in={open} timeout="auto" unmountOnExit>
                             <Box margin={1}>
                                 <Typography variant="h6" gutterBottom component="div">
-                                    History
-              </Typography>
+                                    Details
+                                </Typography>
                                 <Table size="small" aria-label="purchases">
                                     <TableHead>
-                                        <TableRow>
-                                            <TableCell>Date</TableCell>
-                                            <TableCell>Customer</TableCell>
-                                            <TableCell align="right">Amount</TableCell>
-                                            <TableCell align="right">Total price ($)</TableCell>
+                                        <TableRow style={{ backgroundColor: 'bisque', fontWeight: 'bold' }}>
+                                            <TableCell style={{ fontWeight: 'bold' }}>Item</TableCell>
+                                            <TableCell style={{ fontWeight: 'bold' }}>Qty</TableCell>
+                                            <TableCell style={{ fontWeight: 'bold' }} align="right">Price</TableCell>
+                                            <TableCell style={{ fontWeight: 'bold' }} align="right">Total ($)</TableCell>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
-                                        {row.history.map((historyRow) => (
-                                            <TableRow key={historyRow.date}>
+                                        {order.orderedMenu.map((detailsRow) => (
+                                            <TableRow key={detailsRow.menuItemId}>
                                                 <TableCell component="th" scope="row">
-                                                    {historyRow.date}
+                                                    {getMenuItemNameById(order.restaurantId, detailsRow.menuItemId)}
                                                 </TableCell>
-                                                <TableCell>{historyRow.customerId}</TableCell>
-                                                <TableCell align="right">{historyRow.amount}</TableCell>
-                                                <TableCell align="right">
-                                                    {Math.round(historyRow.amount * row.price * 100) / 100}
+                                                <TableCell>{detailsRow.qty}</TableCell>
+                                                <TableCell align="right" style={{ color: 'orange', fontWeight: 'bold' }}>${detailsRow.price}</TableCell>
+                                                <TableCell align="right" style={{ color: 'brown', fontWeight: 'bold' }}>
+                                                    ${Math.round(detailsRow.price * detailsRow.qty)}
                                                 </TableCell>
                                             </TableRow>
                                         ))}
@@ -192,19 +223,19 @@ function Orders() {
 
     Row.propTypes = {
         row: PropTypes.shape({
-            calories: PropTypes.number.isRequired,
-            carbs: PropTypes.number.isRequired,
-            fat: PropTypes.number.isRequired,
-            history: PropTypes.arrayOf(
+            _id: PropTypes.string.isRequired,
+            restaurantId: PropTypes.string.isRequired,
+            address: PropTypes.string.isRequired,
+            orderedMenu: PropTypes.arrayOf(
                 PropTypes.shape({
-                    amount: PropTypes.number.isRequired,
-                    customerId: PropTypes.string.isRequired,
-                    date: PropTypes.string.isRequired,
+                    menuItemId: PropTypes.string.isRequired,
+                    qty: PropTypes.number.isRequired,
+                    price: PropTypes.number.isRequired,
+                    total: PropTypes.number.isRequired
                 }),
             ).isRequired,
-            name: PropTypes.string.isRequired,
-            price: PropTypes.number.isRequired,
-            protein: PropTypes.number.isRequired,
+            orderTotal: PropTypes.number.isRequired,
+            status: PropTypes.string.isRequired,
         }).isRequired,
     };
 
@@ -229,16 +260,16 @@ function Orders() {
                             <TableHead className="tableHead">
                                 <TableRow>
                                     <TableCell className="tableheaderCell" />
-                                    <TableCell className="tableheaderCell">Dessert (100g serving)</TableCell>
-                                    <TableCell className="tableheaderCell" align="right">Calories</TableCell>
-                                    <TableCell className="tableheaderCell" align="right">Fat&nbsp;(g)</TableCell>
-                                    <TableCell className="tableheaderCell" align="right">Carbs&nbsp;(g)</TableCell>
-                                    <TableCell className="tableheaderCell" align="right">Protein&nbsp;(g)</TableCell>
+                                    <TableCell className="tableheaderCell">Order Id</TableCell>
+                                    <TableCell className="tableheaderCell" align="right">Restaurnt</TableCell>
+                                    <TableCell className="tableheaderCell" align="right">Delivary Address</TableCell>
+                                    <TableCell className="tableheaderCell" align="right">Order Price</TableCell>
+                                    <TableCell className="tableheaderCell" align="right">Status</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {rows.map((row) => (
-                                    <Row key={row.name} row={row} />
+                                {fetchedOrders?.map((order) => (
+                                    <Row key={order._id} order={order} />
                                 ))}
                             </TableBody>
                         </Table>
