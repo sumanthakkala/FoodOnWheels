@@ -13,6 +13,7 @@ import { icons, COLORS, SIZES, FONTS } from '../constants'
 import * as dummyData from '../data/dummyData'
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { API_BASE_URL } from '@env'
 
 const styles = StyleSheet.create({
     container: {
@@ -53,7 +54,7 @@ const Search = ({ navigation }) => {
     // })
 
     React.useEffect(() => {
-        axios.get(`http://192.168.2.19:5000/api/categories`)
+        axios.get(API_BASE_URL + `/api/categories`)
             .then(res => {
                 console.log(res.data)
                 setCategories(res.data)
@@ -61,7 +62,7 @@ const Search = ({ navigation }) => {
     }, [])
 
     React.useEffect(() => {
-        axios.get(`http://192.168.2.19:5000/api/restaurants`)
+        axios.get(API_BASE_URL + `/api/restaurants`)
             .then(res => {
                 console.log(res.data)
                 setRestaurants(res.data)

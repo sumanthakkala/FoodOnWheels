@@ -13,6 +13,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useFocusEffect } from '@react-navigation/native';
 import * as dummyData from '../data/dummyData';
 import axios from 'axios';
+import { API_BASE_URL } from '@env'
 
 const Profile = ({ navigation }) => {
 
@@ -52,13 +53,13 @@ const Profile = ({ navigation }) => {
         //     })
         // })
 
-        axios.get(`http://192.168.2.19:5000/api/orders`)
+        axios.get(API_BASE_URL + `/api/orders`)
             .then(res => {
                 console.log(res.data)
                 setOrders(res.data)
             })
 
-        axios.get(`http://192.168.2.19:5000/api/restaurants`)
+        axios.get(API_BASE_URL + `/api/restaurants`)
             .then(res => {
                 console.log(res.data)
                 setRestaurants(res.data)

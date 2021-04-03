@@ -17,6 +17,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import UUIDGenerator from 'react-native-uuid-generator';
 import RBSheet from "react-native-raw-bottom-sheet";
 import axios from 'axios';
+import { API_BASE_URL } from '@env'
 
 const Restaurant = ({ route, navigation }) => {
 
@@ -643,7 +644,7 @@ const Restaurant = ({ route, navigation }) => {
 
 
 
-            axios.post('http://192.168.2.19:5000/api/orders', JSON.stringify(data), {
+            axios.post(API_BASE_URL + '/api/orders', JSON.stringify(data), {
                 headers: {
                     'Content-Type': 'application/json'
                 }

@@ -52,7 +52,7 @@ function Orders() {
 
 
     React.useEffect(() => {
-        axios.get(`http://192.168.2.19:5000/api/orders`)
+        axios.get(process.env.REACT_APP_API_BASE_URL + `/api/orders`)
             .then(res => {
                 console.log(res.data)
                 // setOrders(res.data)
@@ -62,7 +62,7 @@ function Orders() {
     }, [])
 
     React.useEffect(() => {
-        axios.get(`http://localhost:5000/api/restaurants`)
+        axios.get(process.env.REACT_APP_API_BASE_URL + `/api/restaurants`)
             .then(res => {
                 setFetchedRestaurants(res.data)
             })

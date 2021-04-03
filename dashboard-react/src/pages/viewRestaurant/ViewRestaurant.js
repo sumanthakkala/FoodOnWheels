@@ -26,11 +26,11 @@ function ViewRestaurant() {
     const [totalRevenue, setTotlaRevenue] = React.useState(0)
 
     React.useEffect(() => {
-        axios.get(`http://localhost:5000/api/restaurants/` + restaurantId)
+        axios.get(process.env.REACT_APP_API_BASE_URL + `/api/restaurants/` + restaurantId)
             .then(res => {
                 setFetchedRestaurantDetails(res.data)
 
-                axios.get(`http://192.168.2.19:5000/api/orders/restaurant/` + res.data._id)
+                axios.get(process.env.REACT_APP_API_BASE_URL + `/api/orders/restaurant/` + res.data._id)
                     .then(res => {
                         console.log(res.data)
                         // setOrders(res.data)
@@ -40,7 +40,7 @@ function ViewRestaurant() {
                     })
             })
 
-        axios.get(`http://localhost:5000/api/categories`)
+        axios.get(process.env.REACT_APP_API_BASE_URL + `/api/categories`)
             .then(res => {
                 setFetchedCategories(res.data)
             })
@@ -190,7 +190,7 @@ function ViewRestaurant() {
         bodyFormData.append('restaurantId', restaurantId)
         axios({
             method: "post",
-            url: "http://localhost:5000/api/restaurants/add/menuIitem",
+            url: process.env.REACT_APP_API_BASE_URL + "/api/restaurants/add/menuIitem",
             data: bodyFormData,
             headers: { "Content-Type": "multipart/form-data" },
         })
@@ -314,7 +314,7 @@ function ViewRestaurant() {
 
         axios({
             method: "delete",
-            url: 'http://localhost:5000/api/restaurants/deleteMenuItem/' + restaurantId + '/' + menuItemId,
+            url: process.env.REACT_APP_API_BASE_URL + '/api/restaurants/deleteMenuItem/' + restaurantId + '/' + menuItemId,
             // data: bodyFormData,
             headers: { "Content-Type": "multipart/form-data" },
         })

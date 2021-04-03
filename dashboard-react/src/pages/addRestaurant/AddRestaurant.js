@@ -28,7 +28,7 @@ function AddRestaurant() {
 
 
     React.useEffect(() => {
-        axios.get(`http://localhost:5000/api/categories`)
+        axios.get(process.env.REACT_APP_API_BASE_URL + `/api/categories`)
             .then(res => {
                 setCategories(res.data)
             })
@@ -165,7 +165,7 @@ function AddRestaurant() {
         bodyFormData.append('categories', JSON.stringify(categoryIds))
         axios({
             method: "post",
-            url: "http://localhost:5000/api/restaurants",
+            url: process.env.REACT_APP_API_BASE_URL + "/api/restaurants",
             data: bodyFormData,
             headers: { "Content-Type": "multipart/form-data" },
         })

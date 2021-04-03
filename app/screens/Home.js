@@ -11,6 +11,7 @@ import {
 import { icons, images, SIZES, COLORS, FONTS } from '../constants'
 import * as dummyData from '../data/dummyData'
 import axios from 'axios';
+import { API_BASE_URL } from '@env'
 
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
@@ -63,7 +64,7 @@ const Home = ({ navigation }) => {
     // })
 
     React.useEffect(() => {
-        axios.get(`http://192.168.2.19:5000/api/categories`)
+        axios.get(API_BASE_URL + `/api/categories`)
             .then(res => {
                 console.log(res.data)
                 setCategories(res.data)
@@ -71,7 +72,7 @@ const Home = ({ navigation }) => {
     }, [])
 
     React.useEffect(() => {
-        axios.get(`http://192.168.2.19:5000/api/restaurants`)
+        axios.get(API_BASE_URL + `/api/restaurants`)
             .then(res => {
                 console.log(res.data)
                 setRestaurants(res.data)

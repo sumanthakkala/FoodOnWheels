@@ -18,7 +18,7 @@ function Restaurants() {
     const [fetchedRestaurants, setFetchedRestaurants] = React.useState([])
 
     React.useEffect(() => {
-        axios.get(`http://localhost:5000/api/restaurants`)
+        axios.get(process.env.REACT_APP_API_BASE_URL + `/api/restaurants`)
             .then(res => {
                 setFetchedRestaurants(res.data)
             })
@@ -28,7 +28,7 @@ function Restaurants() {
     const deleteRestaurantClicked = (_id) => {
         axios({
             method: "delete",
-            url: 'http://localhost:5000/api/restaurants/' + _id,
+            url: process.env.REACT_APP_API_BASE_URL + '/api/restaurants/' + _id,
             headers: { "Content-Type": "multipart/form-data" },
         })
             .then(function (response) {

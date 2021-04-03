@@ -21,7 +21,7 @@ function Categories() {
     const [fetchedCategoriesData, setFetchedCategoriesData] = React.useState([])
 
     React.useEffect(() => {
-        axios.get(`http://localhost:5000/api/categories`)
+        axios.get(process.env.REACT_APP_API_BASE_URL + `/api/categories`)
             .then(res => {
                 setFetchedCategoriesData(res.data)
             })
@@ -41,7 +41,7 @@ function Categories() {
         bodyFormData.append('image', selectedCategoryIcon)
         axios({
             method: "post",
-            url: "http://localhost:5000/api/categories",
+            url: process.env.REACT_APP_API_BASE_URL + "/api/categories",
             data: bodyFormData,
             headers: { "Content-Type": "multipart/form-data" },
         })
@@ -65,7 +65,7 @@ function Categories() {
     const deleteCategoryClicked = (_id) => {
         axios({
             method: "delete",
-            url: 'http://localhost:5000/api/categories/' + _id,
+            url: process.env.REACT_APP_API_BASE_URL + '/api/categories/' + _id,
             headers: { "Content-Type": "multipart/form-data" },
         })
             .then(function (response) {
