@@ -120,8 +120,9 @@ function Orders() {
                                 Timeline
                         </MenuItem>
                             <MenuItem value={10}>All Time</MenuItem>
-                            <MenuItem value={20}>Last Week</MenuItem>
-                            <MenuItem value={30}>Last Month</MenuItem>
+                            <MenuItem value={20}>Today</MenuItem>
+                            <MenuItem value={30}>Last Week</MenuItem>
+                            <MenuItem value={40}>Last Month</MenuItem>
                         </Select>
                         <FormHelperText>Timeline</FormHelperText>
                     </FormControl>
