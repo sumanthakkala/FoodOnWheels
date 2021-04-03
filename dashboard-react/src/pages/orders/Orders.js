@@ -48,6 +48,7 @@ function Orders() {
     const [orderTimelineFilter, setOrderTimelineFilter] = React.useState(10);
     const [fetchedOrders, setFetchedOrders] = React.useState([])
     const [fetchedRestaurants, setFetchedRestaurants] = React.useState([])
+    const [filteredOrders, setFilteredOrders] = React.useState([])
 
 
     React.useEffect(() => {
@@ -56,6 +57,7 @@ function Orders() {
                 console.log(res.data)
                 // setOrders(res.data)
                 setFetchedOrders(res.data.reverse())
+                setFilteredOrders(res.data)
             })
     }, [])
 
@@ -71,11 +73,84 @@ function Orders() {
 
     const handleStatusChange = (event) => {
         setOrderStatusFilter(event.target.value);
+        refreshListByFilter(event.target.value, orderTimelineFilter)
     };
 
     const handleTimelineChange = (event) => {
         setOrderTimelineFilter(event.target.value);
+        refreshListByFilter(orderStatusFilter, event.target.value)
     };
+
+    function refreshListByFilter(statusFilter, timelineFilter) {
+        var fromDate = new Date()
+        var toDate = new Date()
+        var isAllTime = false
+        var isAllOrders = false
+        var statusFiterQuery = ""
+        switch (timelineFilter) {
+            case 10:
+                isAllTime = true;
+                break;
+            case 20:
+                fromDate.setHours(0, 0, 0, 0);
+                break;
+            case 30:
+                fromDate.setDate(new Date().getDate() - 7)
+                break;
+            case 40:
+                fromDate.setDate(new Date().getDate() - 30)
+                break;
+        }
+        var filteredOrdersByTimeline = []
+        if (isAllTime) {
+            filteredOrdersByTimeline = [...fetchedOrders];
+        }
+        else {
+            filteredOrdersByTimeline = fetchedOrders.filter((order) => {
+                return new Date(order.dateCreated).getTime() >= fromDate.getTime() &&
+                    new Date(order.dateCreated).getTime() <= toDate.getTime();
+            });
+        }
+
+        switch (statusFilter) {
+            case 10:
+                isAllOrders = true;
+                statusFiterQuery = ""
+                break;
+            case 20:
+                statusFiterQuery = "placed"
+
+                break;
+            case 30:
+                statusFiterQuery = "preparing"
+
+                break;
+            case 40:
+                statusFiterQuery = "onTheWay"
+
+                break;
+            case 50:
+                statusFiterQuery = "delivered"
+
+                break;
+        }
+
+        if (isAllTime && isAllOrders) {
+            setFilteredOrders([...fetchedOrders])
+            console.log(filteredOrders)
+        }
+        else if (statusFiterQuery === "") {
+            setFilteredOrders([...filteredOrdersByTimeline])
+        }
+        else {
+            setFilteredOrders([...(filteredOrdersByTimeline.filter((order) => {
+                return order.status === statusFiterQuery
+            }))])
+
+            console.log(filteredOrders)
+        }
+
+    }
 
 
 
@@ -244,7 +319,7 @@ function Orders() {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {fetchedOrders?.map((order) => (
+                                {filteredOrders?.map((order) => (
                                     <Row key={order._id} order={order} />
                                 ))}
                             </TableBody>
