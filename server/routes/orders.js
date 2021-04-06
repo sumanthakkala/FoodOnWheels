@@ -65,6 +65,24 @@ router.post('/', async (req, res) => {
     }
 })
 
+
+
+router.post('/changeStatus', async (req, res) => {
+    console.log(req.body.orderId)
+    console.log(req.body.status)
+    try {
+        const result = await Order.findByIdAndUpdate(
+            req.body.orderId,
+            { $set: { status: req.body.status } }
+        );
+        res.json(result)
+    }
+    catch (err) {
+        console.log(err)
+        res.json({ message: err })
+    }
+})
+
 // router.delete('/:restaurantId', async (req, res) => {
 //     try {
 //         const removedRestaurant = await Restaurant.remove({ _id: req.params.restaurantId })

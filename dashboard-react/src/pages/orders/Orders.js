@@ -49,6 +49,7 @@ function Orders() {
     const [fetchedOrders, setFetchedOrders] = React.useState([])
     const [fetchedRestaurants, setFetchedRestaurants] = React.useState([])
     const [filteredOrders, setFilteredOrders] = React.useState([])
+    const [orderStatus, setOrderStatus] = React.useState('')
 
 
     React.useEffect(() => {
@@ -71,15 +72,43 @@ function Orders() {
 
 
 
-    const handleStatusChange = (event) => {
+    const handleStatusFilterChange = (event) => {
         setOrderStatusFilter(event.target.value);
         refreshListByFilter(event.target.value, orderTimelineFilter)
     };
 
-    const handleTimelineChange = (event) => {
+    const handleTimelineFilterChange = (event) => {
         setOrderTimelineFilter(event.target.value);
         refreshListByFilter(orderStatusFilter, event.target.value)
     };
+
+    const handleStatusChange = (event, orderId) => {
+        var status = event.target.value
+        // event.target.value = status
+
+
+        // var bodyFormData = new FormData();
+        // bodyFormData.append('orderId', orderId)
+        // bodyFormData.append('status', status)
+
+        var data = {
+            orderId: orderId,
+            status: status
+        }
+        axios({
+            method: "post",
+            url: process.env.REACT_APP_API_BASE_URL + "/api/orders/changeStatus",
+            data: data,
+        })
+            .then(function (response) {
+                //handle success\
+                console.log(response)
+            })
+            .catch(function (response) {
+                //handle error
+                console.log(response)
+            });
+    }
 
     function refreshListByFilter(statusFilter, timelineFilter) {
         var fromDate = new Date()
@@ -165,7 +194,7 @@ function Orders() {
                     <FormControl className="formControl">
                         <Select
                             value={orderStatusFilter}
-                            onChange={handleStatusChange}
+                            onChange={handleStatusFilterChange}
                             displayEmpty
                             className=""
                             inputProps={{ 'aria-label': 'Without label' }}
@@ -186,7 +215,7 @@ function Orders() {
                     <FormControl className="formControl">
                         <Select
                             value={orderTimelineFilter}
-                            onChange={handleTimelineChange}
+                            onChange={handleTimelineFilterChange}
                             displayEmpty
                             className=""
                             inputProps={{ 'aria-label': 'Without label' }}
@@ -206,6 +235,32 @@ function Orders() {
 
 
 
+        )
+    }
+
+    function getOrderStatusDropdown(orderId, status) {
+        setOrderStatus(status)
+        // debugger
+        return (
+            <FormControl className="formControl">
+                <Select
+                    // value={status}
+                    defaultValue={status}
+                    onChange={(e) => handleStatusChange(e, orderId)}
+                    displayEmpty
+                    className=""
+                    inputProps={{ 'aria-label': 'Without label' }}
+                >
+                    <MenuItem value="" disabled>
+                        Status
+                        </MenuItem>
+                    <MenuItem value={'placed'}>Placed</MenuItem>
+                    <MenuItem value={'preparing'}>Preparing</MenuItem>
+                    <MenuItem value={'onTheWay'}>On The Way</MenuItem>
+                    <MenuItem value={'delivered'}>Delivered</MenuItem>
+                </Select>
+                <FormHelperText>Status</FormHelperText>
+            </FormControl>
         )
     }
 
@@ -239,7 +294,7 @@ function Orders() {
                     <TableCell align="right">{getRestaurantNameById(order.restaurantId)}</TableCell>
                     <TableCell align="right">{order.address}</TableCell>
                     <TableCell align="right" style={{ color: 'green', fontWeight: 'bold' }}>${order.orderTotal}</TableCell>
-                    <TableCell align="right">{order.status}</TableCell>
+                    <TableCell align="right">{getOrderStatusDropdown(order._id, order.status)}</TableCell>
                 </TableRow>
                 <TableRow>
                     <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
