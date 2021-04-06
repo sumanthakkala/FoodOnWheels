@@ -49,7 +49,6 @@ function Orders() {
     const [fetchedOrders, setFetchedOrders] = React.useState([])
     const [fetchedRestaurants, setFetchedRestaurants] = React.useState([])
     const [filteredOrders, setFilteredOrders] = React.useState([])
-    const [orderStatus, setOrderStatus] = React.useState('')
 
 
     React.useEffect(() => {
@@ -239,8 +238,6 @@ function Orders() {
     }
 
     function getOrderStatusDropdown(orderId, status) {
-        setOrderStatus(status)
-        // debugger
         return (
             <FormControl className="formControl">
                 <Select
