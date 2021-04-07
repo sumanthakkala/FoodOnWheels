@@ -14,6 +14,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import * as dummyData from '../data/dummyData';
 import axios from 'axios';
 import { API_BASE_URL } from '@env'
+import { Colors } from 'react-native/Libraries/NewAppScreen';
 
 const Profile = ({ navigation }) => {
 
@@ -42,6 +43,7 @@ const Profile = ({ navigation }) => {
     const [isDataFetched, setIsDataFetched] = React.useState(false);
     const [restaurants, setRestaurants] = React.useState([])
     const [currentLocation, setCurrentLocation] = React.useState(dummyData.initialCurrentLocation);
+    const [statusTagStyles, setStatusTagStyles] = React.useState({})
 
     function loadData() {
         // AsyncStorage.getItem('orders').then((response) => {
@@ -100,6 +102,28 @@ const Profile = ({ navigation }) => {
         })
     }
 
+    function getStatusTagStyles(status) {
+        var style = {
+            color: COLORS.darkgray,
+            fontWeight: 'bold'
+        }
+        switch (status) {
+            case 'placed':
+                style.color = 'blue'
+                break;
+            case 'preparing':
+                style.color = 'orange'
+                break;
+            case 'onTheWay':
+                style.color = 'brown'
+                break;
+            case 'delivered':
+                style.color = 'darkgreen'
+                break;
+        }
+        return style
+    }
+
     function renederOrders() {
         const renderItem = ({ item }) => (
             <View style={{
@@ -129,6 +153,9 @@ const Profile = ({ navigation }) => {
 
                     <Text style={{ color: COLORS.darkgray }}>
                         {getBasketItemCount(item._id)} items -- ${sumOrder(item._id)}
+                    </Text>
+                    <Text style={getStatusTagStyles(item.status)}>
+                        {item.status}
                     </Text>
                 </View>
 
