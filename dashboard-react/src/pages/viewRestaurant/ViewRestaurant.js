@@ -2,7 +2,6 @@ import React from 'react'
 import './viewRestaurant.css'
 import { FaChartPie, FaUserFriends, FaChartLine } from "react-icons/fa";
 import { GiReceiveMoney } from "react-icons/gi";
-import logo from '../../assets/images/burger-restaurant.jpg';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Avatar from '@material-ui/core/Avatar';

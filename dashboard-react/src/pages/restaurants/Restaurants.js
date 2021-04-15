@@ -2,9 +2,6 @@ import React from 'react'
 import './restaurants.css'
 import { NavLink } from 'react-router-dom'
 
-import * as dummyData from '../../data/dummyData'
-import logo from '../../assets/images/burger-restaurant.jpg'; // with import
-
 import EditIcon from '@material-ui/icons/Edit';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import DeleteIcon from '@material-ui/icons/Delete';

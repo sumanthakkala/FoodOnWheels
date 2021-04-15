@@ -1,0 +1,29 @@
+.container {
+  flex: 1;
+  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+    "Lucida Sans", Arial, sans-serif;
+  overflow: auto;
+}
+
+.couponIcon {
+  color: #fc6d3f;
+  width: 40px;
+  height: 40px;
+}
+
+.couponCodeInput {
+  width: 80%;
+  margin-left: 20px !important;
+}
+
+.couponPercentageInput {
+  width: 20%;
+  margin-left: 20px !important;
+}
+
+.couponInputContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 70%;
+}

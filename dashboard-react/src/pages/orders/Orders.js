@@ -56,8 +56,8 @@ function Orders() {
             .then(res => {
                 console.log(res.data)
                 // setOrders(res.data)
-                setFetchedOrders(res.data.reverse())
-                setFilteredOrders(res.data)
+                setFetchedOrders(res.data?.reverse())
+                setFilteredOrders(res.data ? res.data : [])
             })
     }, [])
 

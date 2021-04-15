@@ -23,7 +23,7 @@ function Categories() {
     React.useEffect(() => {
         axios.get(process.env.REACT_APP_API_BASE_URL + `/api/categories`)
             .then(res => {
-                setFetchedCategoriesData(res.data)
+                setFetchedCategoriesData(res.data ? res.data : [])
             })
     }, [])
 
@@ -47,7 +47,7 @@ function Categories() {
         })
             .then(function (response) {
                 //handle success
-                fetchedCategoriesData.push(response.data)
+                fetchedCategoriesData.push(response.data ? response.data : [])
                 setFetchedCategoriesData([...fetchedCategoriesData])
                 setIsImageChanged(false)
                 setSelectedCategoryIcon(null)
@@ -117,7 +117,7 @@ function Categories() {
                     </div>
                 </div>
 
-                {fetchedCategoriesData.map((item) => (
+                {fetchedCategoriesData?.map((item) => (
                     <div className="categoryCard">
                         <Avatar className="categoryAvatar" src={item.icon}></Avatar>
                         <div className="categoryNameText">{item.name}</div>

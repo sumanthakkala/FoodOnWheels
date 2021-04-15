@@ -1,6 +1,8 @@
 import React from 'react'
 import { MdDashboard, MdStore } from 'react-icons/md'
 import { FaClipboardList, FaBraille } from "react-icons/fa";
+import { RiCoupon5Fill } from "react-icons/ri";
+
 
 
 export const SidebarData = [
@@ -23,5 +25,10 @@ export const SidebarData = [
         title: "Categories",
         icon: <FaBraille />,
         link: "/categories"
+    },
+    {
+        title: "Coupons",
+        icon: <RiCoupon5Fill />,
+        link: "/coupons"
     }
 ]

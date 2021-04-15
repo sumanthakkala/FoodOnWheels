@@ -7,6 +7,7 @@ import Restaurants from './pages/restaurants/Restaurants'
 import Categories from './pages/categories/Categories'
 import AddRestaurant from './pages/addRestaurant/AddRestaurant'
 import ViewRestaurant from './pages/viewRestaurant/ViewRestaurant'
+import Coupons from './pages/coupons/Coupons'
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
           <Route path='/restaurants/add' component={AddRestaurant} />
           <Route path='/restaurants/view/:restaurantId' component={ViewRestaurant} />
           <Route path='/categories' component={Categories} />
+          <Route path='/coupons' component={Coupons} />
         </Switch>
       </div>
 
