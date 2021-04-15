@@ -46,6 +46,18 @@ const OrderSchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Restaurants'
     },
+    subTotal: {
+        type: Number,
+    },
+    serviceFee: {
+        type: Number,
+    },
+    delivaryFee: {
+        type: Number,
+    },
+    hst: {
+        type: Number,
+    },
     orderTotal: {
         type: Number,
     },

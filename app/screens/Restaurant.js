@@ -28,6 +28,10 @@ const Restaurant = ({ route, navigation }) => {
     const [orderObject, setOrderObject] = React.useState({
         orderId: '',
         restaurantId: route.params.restaurantObj._id,
+        subTotal: 0,
+        hst: 0,
+        serviceFee: 3.99,
+        delivaryFee: 2.99,
         orderTotal: 0,
         createdAt: '',
         status: 'placed',
@@ -113,7 +117,11 @@ const Restaurant = ({ route, navigation }) => {
 
     function sumOrder() {
         let total = orderItems.reduce((a, b) => a + (b.total || 0), 0)
-        orderObject.orderTotal = total
+        orderObject.subTotal = total
+        orderObject.serviceFee = 3
+        orderObject.delivaryFee = 2.99
+        orderObject.hst = parseFloat(((orderObject.subTotal + orderObject.serviceFee + orderObject.delivaryFee) * 0.13).toFixed(2))
+        orderObject.orderTotal = parseFloat((orderObject.subTotal + orderObject.serviceFee + orderObject.delivaryFee + orderObject.hst).toFixed(2))
         return total.toFixed(2)
     }
 
@@ -572,6 +580,55 @@ const Restaurant = ({ route, navigation }) => {
                         }}
                         showsVerticalScrollIndicator={false}
                     />
+                    <View>
+                        <View style={{ marginBottom: 5, display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                            <Text style={{ ...FONTS.body3, }}>
+                                Sub Total:
+                            </Text>
+                            <Text style={{ ...FONTS.body3, fontWeight: 'bold' }}>
+                                ${orderObject.subTotal}
+                            </Text>
+                        </View>
+
+                        <View style={{ marginBottom: 5, display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                            <Text style={{ ...FONTS.body3, }}>
+                                Service Fee:
+                            </Text>
+                            <Text style={{ ...FONTS.body3, fontWeight: 'bold' }}>
+                                ${orderObject.serviceFee}
+                            </Text>
+                        </View>
+
+                        <View style={{ marginBottom: 5, display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                            <Text style={{ ...FONTS.body3, }}>
+                                Delivary Fee:
+                            </Text>
+                            <Text style={{ ...FONTS.body3, fontWeight: 'bold' }}>
+                                ${orderObject.delivaryFee}
+                            </Text>
+                        </View>
+
+                        <View style={{ marginBottom: 5, display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                            <Text style={{ ...FONTS.body3, }}>
+                                HST @13%:
+                            </Text>
+                            <Text style={{ ...FONTS.body3, fontWeight: 'bold' }}>
+                                ${orderObject.hst}
+                            </Text>
+                        </View>
+
+                        <View style={{ marginBottom: 5, display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                            <Text style={{ ...FONTS.body3, }}>
+                                Order Total:
+                            </Text>
+                            <Text style={{ ...FONTS.body3, fontWeight: 'bold' }}>
+                                ${orderObject.orderTotal}
+                            </Text>
+                        </View>
+
+                    </View>
+
+
 
 
 
@@ -603,38 +660,12 @@ const Restaurant = ({ route, navigation }) => {
         console.log(orderObject)
         if (orderObject.orderedMenu.length > 0) {
 
-
-
-            // AsyncStorage.getItem('orders').then((response) => {
-            //     let orders = response != null ? JSON.parse(response) : [];
-            //     console.log(orders)
-            //     //orderObject.orderId = uuid.v1();
-            //     UUIDGenerator.getRandomUUID().then((uuid) => {
-            //         orderObject.orderId = uuid;
-            //         orderObject.createdAt = new Date().toISOString();
-            //         orders.push(orderObject);
-            //         console.log(orders)
-            //         AsyncStorage.setItem('orders', JSON.stringify(orders)).then(() => {
-            //             Alert.alert(
-            //                 "Thank you for placing the order.",
-            //                 "My Alert Msg",
-            //                 [
-            //                     {
-            //                         text: "View Orders", onPress: () => {
-            //                             navigation.navigate("Home", {
-            //                                 screen: 'Profile'
-            //                             })
-            //                         }
-            //                     }
-            //                 ]
-            //             );
-            //         })
-            //     })
-            // })
-
-
             var data = {
                 restaurantId: orderObject.restaurantId,
+                subTotal: orderObject.subTotal,
+                delivaryFee: orderObject.delivaryFee,
+                serviceFee: orderObject.serviceFee,
+                hst: orderObject.hst,
                 orderTotal: orderObject.orderTotal,
                 status: orderObject.status,
                 duration: restaurant.duration,

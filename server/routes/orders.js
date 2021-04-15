@@ -42,6 +42,10 @@ router.post('/', async (req, res) => {
     const order = new Order({
 
         restaurantId: req.body.restaurantId,
+        subTotal: req.body.subTotal,
+        serviceFee: req.body.serviceFee,
+        delivaryFee: req.body.delivaryFee,
+        hst: req.body.hst,
         orderTotal: req.body.orderTotal,
         status: req.body.status,
         duration: req.body.duration,

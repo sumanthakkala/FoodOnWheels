@@ -152,7 +152,7 @@ const Profile = ({ navigation }) => {
                     </Text>
 
                     <Text style={{ color: COLORS.darkgray }}>
-                        {getBasketItemCount(item._id)} items -- ${sumOrder(item._id)}
+                        {getBasketItemCount(item._id)} items -- ${item.orderTotal}
                     </Text>
                     <Text style={getStatusTagStyles(item.status)}>
                         {item.status}
