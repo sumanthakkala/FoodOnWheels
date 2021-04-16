@@ -47,6 +47,20 @@ router.post('/', uploadHelper, async (req, res) => {
     }
 })
 
+router.post('/increaseVisitCount/:restaurantId', async (req, res) => {
+    try {
+        const result = await Restaurant.findByIdAndUpdate(
+            req.params.restaurantId,
+            { $inc: { visitCount: 1 } }
+        );
+        res.json(result)
+    }
+    catch (err) {
+        console.log(err)
+        res.json({ message: err })
+    }
+})
+
 router.delete('/:restaurantId', async (req, res) => {
     try {
         const removedRestaurant = await Restaurant.remove({ _id: req.params.restaurantId })

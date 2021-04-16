@@ -26,7 +26,13 @@ function Dashboard() {
                 // setOrders(res.data)
                 setFetchedOrders(res.data)
                 var total = res.data?.reduce((a, b) => a + (b.orderTotal || 0), 0)
+                var delivaryFee = res.data?.reduce((a, b) => a + (b.delivaryFee || 0), 0)
+                var serviceFee = res.data?.reduce((a, b) => a + (b.serviceFee || 0), 0)
+                var hst = res.data?.reduce((a, b) => a + (b.hst || 0), 0)
                 setTotlaRevenue(total)
+                setDelivaryFeeRevenue(delivaryFee)
+                setServiceFeeRevenue(serviceFee)
+                setTotalHst(hst)
                 if (res.data.length > 10) {
                     setRecentOrders(res.data.slice(Math.max(res.data.length - 10, 1)).reverse())
                 }
@@ -47,6 +53,9 @@ function Dashboard() {
     const [fetchedOrders, setFetchedOrders] = React.useState([])
     const [fetchedRestaurants, setFetchedRestaurants] = React.useState([])
     const [totalRevenue, setTotlaRevenue] = React.useState(0)
+    const [delivaryFeeRevenue, setDelivaryFeeRevenue] = React.useState(0)
+    const [serviceFeeRevenue, setServiceFeeRevenue] = React.useState(0)
+    const [totalHst, setTotalHst] = React.useState(0)
     const [recentOrders, setRecentOrders] = React.useState([])
 
 
@@ -76,7 +85,46 @@ function Dashboard() {
                     </div>
 
                     <div>
-                        ${totalRevenue}
+                        ${totalRevenue.toFixed(2)}
+                    </div>
+                </div>
+
+                <div className="overviewTile">
+                    <div className="row">
+                        <div>
+                            Delivary Fee Revenue
+                    </div>
+                        <GiReceiveMoney />
+                    </div>
+
+                    <div>
+                        ${delivaryFeeRevenue.toFixed(2)}
+                    </div>
+                </div>
+
+                <div className="overviewTile">
+                    <div className="row">
+                        <div>
+                            Service Fee Revenue
+                    </div>
+                        <GiReceiveMoney />
+                    </div>
+
+                    <div>
+                        ${serviceFeeRevenue.toFixed(2)}
+                    </div>
+                </div>
+
+                <div className="overviewTile">
+                    <div className="row">
+                        <div>
+                            Total HST @13%/Order
+                    </div>
+                        <GiReceiveMoney />
+                    </div>
+
+                    <div>
+                        ${totalHst.toFixed(2)}
                     </div>
                 </div>
 

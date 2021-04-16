@@ -62,6 +62,14 @@ const Restaurant = ({ route, navigation }) => {
     })
 
     React.useEffect(() => {
+        axios.post(API_BASE_URL + `/api/restaurants/increaseVisitCount/` + restaurant?._id)
+            .then(res => {
+                console.log(res.data)
+            })
+    }, [restaurant])
+
+    React.useEffect(() => {
+
         axios.get(API_BASE_URL + `/api/coupons`)
             .then(res => {
                 console.log(res.data)

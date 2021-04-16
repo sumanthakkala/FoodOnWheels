@@ -117,7 +117,7 @@ function ViewRestaurant() {
                         </div>
 
                         <div>
-                            ${totalRevenue}
+                            ${totalRevenue.toFixed(2)}
                         </div>
                     </div>
 

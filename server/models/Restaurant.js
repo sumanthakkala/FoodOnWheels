@@ -23,6 +23,10 @@ const RestaurantSchema = mongoose.Schema({
         type: String,
         required: true
     },
+    visitCount: {
+        type: Number,
+        default: 0
+    },
     rating: {
         type: Number,
         default: 4.8
