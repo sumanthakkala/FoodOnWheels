@@ -43,6 +43,9 @@ router.post('/', async (req, res) => {
 
         restaurantId: req.body.restaurantId,
         subTotal: req.body.subTotal,
+        afterCouponSubTotal: req.body.afterCouponSubTotal,
+        couponCode: req.body.couponCode,
+        couponPercentage: req.body.couponPercentage,
         serviceFee: req.body.serviceFee,
         delivaryFee: req.body.delivaryFee,
         hst: req.body.hst,

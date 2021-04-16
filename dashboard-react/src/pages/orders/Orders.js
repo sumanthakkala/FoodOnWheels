@@ -324,6 +324,24 @@ function Orders() {
                                         ))}
                                     </TableBody>
                                 </Table>
+                                <div className="invoiceDetails">
+                                    <div className="invoiceItem">
+                                        <p>Sub Total: <b>${order.afterCouponSubTotal}</b></p>
+                                    </div>
+                                    <div className="invoiceItem">
+                                        <p>Service Fee: <b>${order.serviceFee}</b></p>
+                                    </div>
+                                    <div className="invoiceItem">
+                                        <p>Delivary Fee: <b>${order.delivaryFee}</b></p>
+                                    </div>
+                                    <div className="invoiceItem">
+                                        <p>HST @13%: <b>${order.hst}</b></p>
+                                    </div>
+                                    <div className="invoiceItem">
+                                        <p>Coupon: <b>{order.couponCode}</b> @ <b>{order.couponPercentage}%</b> Off</p>
+                                    </div>
+
+                                </div>
                             </Box>
                         </Collapse>
                     </TableCell>

@@ -49,6 +49,15 @@ const OrderSchema = mongoose.Schema({
     subTotal: {
         type: Number,
     },
+    afterCouponSubTotal: {
+        type: Number,
+    },
+    couponCode: {
+        type: String,
+    },
+    couponPercentage: {
+        type: Number,
+    },
     serviceFee: {
         type: Number,
     },

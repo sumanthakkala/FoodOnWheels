@@ -25,21 +25,30 @@ const Restaurant = ({ route, navigation }) => {
     const [restaurant, setRestaurant] = React.useState(null);
     const [currentLocation, setCurrentLocation] = React.useState(null);
     const [orderItems, setOrderItems] = React.useState([]);
+    const [coupons, setCoupons] = React.useState([])
+    const [subTotal, setSubTotal] = React.useState(0)
+    const [hst, setHst] = React.useState(0)
+    const [orderTotal, setOrderTotal] = React.useState(0)
     const [orderObject, setOrderObject] = React.useState({
         orderId: '',
         restaurantId: route.params.restaurantObj._id,
         subTotal: 0,
+        afterCouponSubTotal: 0,
         hst: 0,
         serviceFee: 3.99,
         delivaryFee: 2.99,
         orderTotal: 0,
         createdAt: '',
         status: 'placed',
+        couponCode: '',
+        couponPercentage: 0,
         orderedMenu: []
     });
     const refRBSheet = React.useRef();
+    const refCouponRBSheet = React.useRef();
     const [cartHeight, setCartHeight] = React.useState(300)
-
+    const [appliedCouponCode, setAppliedCouponCode] = React.useState('')
+    const [appliedCouponPercentage, setAppliedCouponPercentage] = React.useState(0)
 
     React.useEffect(() => {
         let { restaurantObj, currentLocation } = route.params;
@@ -51,6 +60,14 @@ const Restaurant = ({ route, navigation }) => {
         //     orderedMenu: []
         // })
     })
+
+    React.useEffect(() => {
+        axios.get(API_BASE_URL + `/api/coupons`)
+            .then(res => {
+                console.log(res.data)
+                setCoupons(res.data)
+            })
+    }, [])
 
     function editOrder(action, menuId, price) {
         let orderObj = orderObject
@@ -118,11 +135,21 @@ const Restaurant = ({ route, navigation }) => {
     function sumOrder() {
         let total = orderItems.reduce((a, b) => a + (b.total || 0), 0)
         orderObject.subTotal = total
-        orderObject.serviceFee = 3
-        orderObject.delivaryFee = 2.99
-        orderObject.hst = parseFloat(((orderObject.subTotal + orderObject.serviceFee + orderObject.delivaryFee) * 0.13).toFixed(2))
-        orderObject.orderTotal = parseFloat((orderObject.subTotal + orderObject.serviceFee + orderObject.delivaryFee + orderObject.hst).toFixed(2))
         return total.toFixed(2)
+    }
+
+    function updateOrderInvoice() {
+        let orderObj = orderObject
+        orderObj.afterCouponSubTotal = orderObject.subTotal * ((100 - orderObj.couponPercentage) / 100)
+        orderObj.serviceFee = 3
+        orderObj.delivaryFee = 2.99
+        orderObj.hst = parseFloat(((orderObj.afterCouponSubTotal + orderObj.serviceFee + orderObj.delivaryFee) * 0.13).toFixed(2))
+        orderObj.orderTotal = parseFloat((orderObj.afterCouponSubTotal + orderObj.serviceFee + orderObj.delivaryFee + orderObj.hst).toFixed(2))
+        setSubTotal(orderObj.afterCouponSubTotal)
+        setHst(orderObj.hst)
+        setOrderTotal(orderObj.orderTotal)
+
+        return orderObj
     }
 
     function renderHeader() {
@@ -441,7 +468,7 @@ const Restaurant = ({ route, navigation }) => {
                                 borderRadius: SIZES.radius
                             }}
                             // onPress={() => placeOrder()}
-                            onPress={() => refRBSheet.current.open()}
+                            onPress={() => { updateOrderInvoice(); refRBSheet.current.open() }}
                         >
                             <Text style={{ color: COLORS.white, ...FONTS.h2 }}>View Cart</Text>
                         </TouchableOpacity>
@@ -586,7 +613,7 @@ const Restaurant = ({ route, navigation }) => {
                                 Sub Total:
                             </Text>
                             <Text style={{ ...FONTS.body3, fontWeight: 'bold' }}>
-                                ${orderObject.subTotal}
+                                ${subTotal}
                             </Text>
                         </View>
 
@@ -613,16 +640,30 @@ const Restaurant = ({ route, navigation }) => {
                                 HST @13%:
                             </Text>
                             <Text style={{ ...FONTS.body3, fontWeight: 'bold' }}>
-                                ${orderObject.hst}
+                                ${hst}
                             </Text>
                         </View>
+
+                        <TouchableOpacity
+                            style={{
+                                width: SIZES.width * 0.9,
+                                padding: SIZES.padding2 / 2,
+                                backgroundColor: COLORS.lightGray3,
+                                alignItems: 'center',
+                                borderRadius: SIZES.radius
+                            }}
+                            // onPress={() => placeOrder()}
+                            onPress={() => applyCouponBtnClicked()}
+                        >
+                            <Text style={{ color: 'green', fontSize: 14 }}>{appliedCouponCode === '' ? 'Apply Coupon' : appliedCouponCode}</Text>
+                        </TouchableOpacity>
 
                         <View style={{ marginBottom: 5, display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                             <Text style={{ ...FONTS.body3, }}>
                                 Order Total:
                             </Text>
                             <Text style={{ ...FONTS.body3, fontWeight: 'bold' }}>
-                                ${orderObject.orderTotal}
+                                ${orderTotal}
                             </Text>
                         </View>
 
@@ -656,6 +697,132 @@ const Restaurant = ({ route, navigation }) => {
         )
     }
 
+    function applyCouponBtnClicked() {
+        refCouponRBSheet.current.open()
+
+    }
+
+    function renderCoupons() {
+        const renderItem = ({ item }) => (
+            <View style={{
+                display: 'flex',
+                flexDirection: 'row',
+                paddingVertical: SIZES.padding,
+                justifyContent: 'flex-start',
+                alignItems: 'center',
+                borderBottomColor: COLORS.secondary,
+                borderBottomWidth: 1
+            }}>
+                <View style={{ flexDirection: 'column', justifyContent: 'flex-start' }}>
+
+                    <Text style={{ fontSize: SIZES.body2 }}>
+                        {item.couponCode}
+                    </Text>
+
+
+                    <Text style={{
+                        ...FONTS.body4, color: COLORS.darkgray, marginTop: 5,
+                        alignItems: 'center'
+                    }}>Save {item.couponPercentage}% on your order sub total.</Text>
+
+                </View>
+
+                {/* <Text style={{ fontSize: SIZES.body2, fontWeight: 'bold', marginLeft: SIZES.padding * 2 }}>
+                    Apply
+                    </Text> */}
+
+                <TouchableOpacity
+                    style={{
+                        width: SIZES.width * 0.2,
+                        padding: SIZES.padding / 2,
+                        marginLeft: SIZES.padding * 2,
+                        backgroundColor: COLORS.primary,
+                        alignItems: 'center',
+                        borderRadius: SIZES.radius
+                    }}
+                    // onPress={() => placeOrder()}
+                    onPress={() => applyCoupon(item._id)}
+                >
+                    <Text style={{ color: COLORS.white, fontSize: 14 }}>{appliedCouponCode === item.couponCode ? "Remove" : "Apply"}</Text>
+                </TouchableOpacity>
+
+            </View >
+        )
+
+
+        return (
+            <RBSheet
+                ref={refCouponRBSheet}
+                closeOnDragDown={true}
+                closeOnPressMask={false}
+                height={400}
+                customStyles={{
+                    wrapper: {
+                        backgroundColor: "transparent",
+                    },
+                    draggableIcon: {
+                        backgroundColor: COLORS.primary
+                    },
+                    container: {
+                        display: 'flex',
+                        flex: 1,
+                        alignItems: 'center'
+                        // height: cartHeight
+                    }
+                }}
+            >
+                <View onLayout={(e) => setCartHeight(e.nativeEvent.layout.height)} style={{ paddingBottom: SIZES.padding * 6, paddingTop: SIZES.padding }}>
+
+                    <View style={{
+                        alignItems: 'center', padding: SIZES.padding
+                    }}>
+                        <Text style={{ fontSize: 25, ...FONTS.body1 }}>
+                            Coupons
+                        </Text>
+                    </View>
+
+
+                    <FlatList
+                        data={coupons}
+                        keyExtractor={item => `${item._id}`}
+                        renderItem={renderItem}
+                        contentContainerStyle={{
+                            // paddingHorizontal: SIZES.padding * 2,
+                            // paddingBottom: 80,
+                            flex: 1,
+                            // flexGrow: 0,
+                        }}
+                        showsVerticalScrollIndicator={false}
+                    />
+                </View>
+            </RBSheet>
+        )
+    }
+
+    function applyCoupon(couponId) {
+        var selectedCoupon = coupons.find((item) => item._id === couponId)
+        if (orderObject.couponCode === selectedCoupon.couponCode) {
+            orderObject.couponCode = ''
+            orderObject.couponPercentage = 0
+            setAppliedCouponCode('')
+            setAppliedCouponPercentage(0)
+            var orderObj = updateOrderInvoice()
+            setOrderObject(orderObj)
+        }
+        else {
+            orderObject.couponCode = selectedCoupon.couponCode
+            orderObject.couponPercentage = selectedCoupon.couponPercentage
+            setAppliedCouponCode(selectedCoupon.couponCode)
+            setAppliedCouponPercentage(selectedCoupon.couponPercentage)
+            var orderObj = updateOrderInvoice()
+            setOrderObject(orderObj)
+
+        }
+
+
+        refCouponRBSheet.current.close()
+    }
+
     function placeOrder() {
         console.log(orderObject)
         if (orderObject.orderedMenu.length > 0) {
@@ -663,6 +830,9 @@ const Restaurant = ({ route, navigation }) => {
             var data = {
                 restaurantId: orderObject.restaurantId,
                 subTotal: orderObject.subTotal,
+                afterCouponSubTotal: orderObject.afterCouponSubTotal,
+                couponCode: orderObject.couponCode,
+                couponPercentage: orderObject.couponPercentage,
                 delivaryFee: orderObject.delivaryFee,
                 serviceFee: orderObject.serviceFee,
                 hst: orderObject.hst,
@@ -715,6 +885,7 @@ const Restaurant = ({ route, navigation }) => {
             {renderFoodInfo()}
             {renderOrder()}
             {renderCart()}
+            {renderCoupons()}
 
         </SafeAreaView>
     )
