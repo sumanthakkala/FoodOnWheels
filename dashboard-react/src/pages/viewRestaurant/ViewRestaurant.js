@@ -8,6 +8,8 @@ import Avatar from '@material-ui/core/Avatar';
 import { IconButton } from '@material-ui/core';
 import axios from 'axios';
 import { useParams } from 'react-router';
+import { Bar, Line } from "react-chartjs-2";
+
 
 function ViewRestaurant() {
 
@@ -327,11 +329,154 @@ function ViewRestaurant() {
             });
     }
 
+    function getDataForBarChart() {
+        const data = {
+            labels: ["Visists", "Sales"],
+            datasets: [{
+                label: "Visits vs Sales",
+                borderWidth: 1,
+                backgroundColor: '#fc6d3f',
+                data: [fetchedRestaurantDetails?.visitCount, fetchedOrders.length],
+            }]
+        };
+        return data
+    }
+
+    const barOptions = {
+        scales: {
+            xAxes: [{
+                stacked: true
+            }],
+            yAxes: [{
+                stacked: true
+            }]
+        },
+        maintainAspectRatio: false
+    };
+
+    function getLineChartData() {
+
+        var labels = []
+        var revenueDataset = []
+        var orderCountDataset = []
+        debugger
+        var ordersCopy = [...fetchedOrders]
+        const sortedOrders = ordersCopy.sort((a, b) => new Date(b.dateCreated) - new Date(a.dateCreated))
+
+        sortedOrders?.map((item) => {
+            var date = new Date(item.dateCreated)
+
+            var labelDateStr = date.getDate() + "/" + date.getMonth() + "/" + date.getFullYear()
+            var labelDate = new Date(labelDateStr)
+            var labelsIndex = labels.indexOf(labelDateStr)
+            if (labelsIndex >= 0) {
+                revenueDataset[labelsIndex] = parseFloat(revenueDataset[labelsIndex]) + item.orderTotal
+                orderCountDataset[labelsIndex] = orderCountDataset[labelsIndex] + 1
+                revenueDataset[labelsIndex] = parseFloat(revenueDataset[labelsIndex]).toFixed(2)
+            }
+            else {
+                labels.push(labelDateStr)
+                revenueDataset.push(parseFloat(item.orderTotal).toFixed(2))
+                orderCountDataset.push(1)
+            }
+        })
+
+        const data = {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Revenue',
+                    data: revenueDataset,
+                    borderColor: 'red'
+                    // yAxisID: 'yAxis',
+                },
+                {
+                    label: 'Orders Count',
+                    data: orderCountDataset,
+                    borderColor: 'blue'
+                    // yAxisID: 'yAxis',
+                }
+            ]
+        };
+        return data
+    }
+
+    const lineOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: {
+            mode: 'index',
+            intersect: false,
+        },
+        stacked: false,
+        scales: {
+            yAxes: [
+                {
+                    id: 'yAxis',
+                    ticks: {
+                        autoSkip: true,
+                        // maxTicksLimit: 10,
+                        // beginAtZero: true,
+                    },
+                },
+            ],
+
+            xAxes: [
+                {
+                    // distribution: 'linear',
+                    // type: "time",
+                    // time: {
+                    //     min: range_min.getTime(),
+                    //     max: range_max.getTime(),
+                    //     unit: "day",
+                    //     unitStepSize: 1,
+                    //     displayFormats: {
+                    //         day: '\nDD/MM/YYYY hh:mm a\n'
+                    //     },
+                    // },
+                    id: 'xAxis',
+                    ticks: {
+                        align: 'end',
+                        autoSkip: true,
+                    }
+                },
+            ],
+        }
+    };
+
+
+    function getStats() {
+        return (
+            <div className="statsContainer">
+                <p>
+                    Statistics
+                </p>
+
+                <div className="chartsContainer">
+                    <div className="chartsRow">
+                        <div className="chartContainer">
+
+                            <Bar data={getDataForBarChart()} width={50} height={50} options={barOptions} />
+                        </div>
+
+                        <div className="chartContainer">
+
+                            <Line data={getLineChartData()} width={50} height={50} options={lineOptions} />
+                        </div>
+                    </div>
+
+
+                </div>
+
+            </div>
+        )
+    }
 
 
     return (
         <div className="container">
             {getRestaurantHeader()}
+            {getStats()}
             {getMenuList()}
         </div>
     )

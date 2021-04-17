@@ -102,6 +102,13 @@ function Orders() {
             .then(function (response) {
                 //handle success\
                 console.log(response)
+                axios.get(process.env.REACT_APP_API_BASE_URL + `/api/orders`)
+                    .then(res => {
+                        console.log(res.data)
+                        // setOrders(res.data)
+                        setFetchedOrders(res.data?.reverse())
+                        setFilteredOrders(res.data ? res.data : [])
+                    })
             })
             .catch(function (response) {
                 //handle error
