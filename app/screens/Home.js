@@ -14,6 +14,7 @@ import axios from 'axios';
 import { API_BASE_URL } from '@env'
 
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { Colors } from "react-native/Libraries/NewAppScreen";
 
 const styles = StyleSheet.create({
     container: {
@@ -160,6 +161,33 @@ const Home = ({ navigation }) => {
         setSelectedCategory(category)
     }
 
+    function onAllCategoriesClicked() {
+        //filter restaurant
+        // let restaurantList = dummyData.restaurantData.filter(a => a.categories.includes(category.id))
+
+        let restaurantList = [...restaurantsDataCopy]
+        setRestaurants(restaurantList)
+        setSelectedCategory(null)
+    }
+
+    function onPriceRatingFilter(rating) {
+        let restaurantList = []
+        switch (rating) {
+            case 'affordable':
+                restaurantList = restaurantsDataCopy.filter(a => a.priceRating == 1)
+                setRestaurants(restaurantList)
+                break;
+            case 'fair':
+                restaurantList = restaurantsDataCopy.filter(a => a.priceRating == 2)
+                setRestaurants(restaurantList)
+                break;
+            case 'expensive':
+                restaurantList = restaurantsDataCopy.filter(a => a.priceRating == 3)
+                setRestaurants(restaurantList)
+                break;
+        }
+    }
+
     function renderMainCategories() {
         const renderItem = ({ item }) => {
             return (
@@ -211,17 +239,79 @@ const Home = ({ navigation }) => {
 
         return (
             <View style={{ padding: SIZES.padding * 2 }}>
-                <Text style={{ ...FONTS.h1 }}>Main</Text>
-                <Text style={{ ...FONTS.h1 }}>Categories</Text>
+                <View style={{ display: 'flex', flexDirection: "row" }}>
+                    <View style={{ display: 'flex', flexDirection: 'column' }}>
+                        <Text style={{ ...FONTS.h1 }}>Main</Text>
+                        <Text style={{ ...FONTS.h1 }}>Categories</Text>
+                    </View>
+                    <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                        <TouchableOpacity onPress={() => onPriceRatingFilter('affordable')}>
+                            <Text style={{ ...FONTS.h3, marginLeft: 20, justifyContent: 'center' }}>$</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => onPriceRatingFilter('fair')}>
+                            <Text style={{ ...FONTS.h3, marginLeft: 20, justifyContent: 'center' }}>$$</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => onPriceRatingFilter('expensive')}>
+                            <Text style={{ ...FONTS.h3, marginLeft: 20, justifyContent: 'center' }}>$$$</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
 
-                <FlatList
-                    data={categories}
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    keyExtractor={item => `${item._id}`}
-                    renderItem={renderItem}
-                    contentContainerStyle={{ paddingVertical: SIZES.padding * 2 }}
-                />
+
+                <View style={{ display: 'flex', flexDirection: 'row' }}>
+                    <View style={{ paddingVertical: SIZES.padding * 2 }}>
+                        <TouchableOpacity
+                            style={{
+                                padding: SIZES.padding,
+                                paddingBottom: SIZES.padding * 2,
+                                backgroundColor: selectedCategory == null ? COLORS.primary : COLORS.white,
+                                borderRadius: SIZES.radius,
+                                alignItems: "center",
+                                justifyContent: "center",
+                                marginRight: SIZES.padding,
+                                ...styles.shadow
+                            }}
+                            onPress={() => onAllCategoriesClicked()}
+                        >
+                            <View
+                                style={{
+                                    width: 50,
+                                    height: 50,
+                                    borderRadius: 25,
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    backgroundColor: selectedCategory == null ? COLORS.white : COLORS.lightGray,
+                                    display: 'flex'
+                                }}
+                            >
+                                <Text style={{ ...FONTS.h1, }}>...</Text>
+                            </View>
+
+                            <Text
+                                style={{
+                                    marginTop: SIZES.padding,
+                                    color: selectedCategory == null ? COLORS.white : COLORS.black,
+                                    ...FONTS.body5
+                                }}
+                            >
+                                All
+                        </Text>
+
+                        </TouchableOpacity>
+                    </View>
+
+
+
+                    <FlatList
+                        data={categories}
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                        keyExtractor={item => `${item._id}`}
+                        renderItem={renderItem}
+                        contentContainerStyle={{ paddingVertical: SIZES.padding * 2 }}
+                    />
+                </View>
+
             </View>
         )
     }
