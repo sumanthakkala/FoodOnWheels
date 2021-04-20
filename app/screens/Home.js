@@ -67,7 +67,6 @@ const Home = ({ navigation }) => {
     React.useEffect(() => {
         axios.get(API_BASE_URL + `/api/categories`)
             .then(res => {
-                console.log(res.data)
                 setCategories(res.data)
             })
     }, [])
@@ -75,7 +74,6 @@ const Home = ({ navigation }) => {
     React.useEffect(() => {
         axios.get(API_BASE_URL + `/api/restaurants`)
             .then(res => {
-                console.log(res.data)
                 setRestaurants(res.data)
                 setRestaurantsDataCopy(res.data)
             })

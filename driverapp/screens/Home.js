@@ -1,7 +1,11 @@
 import React from 'react'
-import { View, Text, SafeAreaView, FlatList, StyleSheet, TouchableOpacity } from 'react-native'
+import { View, Text, SafeAreaView, FlatList, StyleSheet, TouchableOpacity, Platform, PermissionsAndroid } from 'react-native'
 import axios from 'axios';
 import { API_BASE_URL } from '@env'
+import PubNub from 'pubnub';
+import Geolocation from '@react-native-community/geolocation';
+
+
 
 const styles = StyleSheet.create({
     container: {
@@ -30,26 +34,71 @@ const Home = () => {
     const [isOrderDelivered, setIsOrderDelivered] = React.useState(false)
     const [isOrderOnTheWay, setIsOrderOnTheWay] = React.useState(false)
     const [ordersCopy, setOrdersCopy] = React.useState([])
+    const [driverLoc, setDriverLoc] = React.useState({})
+    const [watchId, setWatchId] = React.useState(null)
 
+    const pubnub = new PubNub({
+        publishKey: "pub-c-f41fd6dd-81ae-4016-bfb2-cfd55a0e31b5",
+        subscribeKey: "sub-c-5a15a0a4-a15d-11eb-8d7b-b642bba3de20"
+    });
     React.useEffect(() => {
+        if (Platform.OS === 'android') {
+            PermissionsAndroid.request(
+                PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+            );
+        }
         axios.get(API_BASE_URL + `/api/orders`)
             .then(res => {
-                console.log(res.data)
                 var preparingOrders = res.data?.filter((item) => item.status === 'preparing')
                 setOrders(preparingOrders)
                 setOrdersCopy(preparingOrders)
                 setUserLat(43.72743042699409)
                 setUserLong(-79.29884181730858)
             })
+
+
     }, [])
 
     React.useEffect(() => {
         axios.get(API_BASE_URL + `/api/restaurants`)
             .then(res => {
-                console.log(res.data)
                 setRestaurants(res.data)
             })
     }, [])
+
+    React.useEffect(() => {
+        pubnub?.publish({
+            message: {
+                latitude: driverLoc?.latitude,
+                longitude: driverLoc?.longitude
+            },
+            channel: "location"
+        });
+    }, [driverLoc])
+
+    const watchLocation = () => {
+        var watchId = Geolocation.watchPosition(
+            position => {
+                const { latitude, longitude } = position.coords;
+
+                const newCoordinate = {
+                    latitude,
+                    longitude
+                };
+                console.log(newCoordinate)
+
+                setDriverLoc(newCoordinate)
+            },
+            error => console.log(error),
+            {
+                enableHighAccuracy: true,
+                timeout: 20000,
+                maximumAge: 1000,
+                distanceFilter: 10
+            }
+        );
+        setWatchId(watchId)
+    };
 
 
     function getRestaurantName(id) {
@@ -62,11 +111,13 @@ const Home = () => {
             var allorders = [...ordersCopy]
             status = 'delivered'
             // setOrders(allorders)
+            Geolocation.clearWatch(watchId)
         }
         else {
             var order = ordersCopy.filter((order) => order._id === orderId)
             status = 'onTheWay'
             setOrders(order)
+            watchLocation()
         }
 
         var data = {

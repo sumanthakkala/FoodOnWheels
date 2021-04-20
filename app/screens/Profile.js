@@ -57,13 +57,11 @@ const Profile = ({ navigation }) => {
 
         axios.get(API_BASE_URL + `/api/orders`)
             .then(res => {
-                console.log(res.data)
                 setOrders(res.data)
             })
 
         axios.get(API_BASE_URL + `/api/restaurants`)
             .then(res => {
-                console.log(res.data)
                 setRestaurants(res.data)
             })
     }
@@ -124,6 +122,39 @@ const Profile = ({ navigation }) => {
         return style
     }
 
+    function getTrackOrderBtn(rid) {
+        return (
+            <TouchableOpacity
+                style={{
+                    // flex: 1,
+                    // alignItems: 'flex-end',
+                }}
+                onPress={() => trackOrderBtnClicked(rid)}
+            >
+                <View
+                    style={{
+                        height: 30,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        paddingHorizontal: SIZES.padding * 2,
+                        borderRadius: SIZES.radius,
+                        backgroundColor: COLORS.primary
+                    }}
+                >
+                    <Text style={{ ...FONTS.body4, color: COLORS.white, fontWeight: 'bold' }}>Track</Text>
+                </View>
+            </TouchableOpacity>
+        )
+    }
+
+    function trackOrderBtnClicked(rid) {
+        let restaurant = getRestaurantById(rid);
+        navigation.navigate("OrderDelivary", {
+            restaurant,
+            currentLocation
+        })
+    }
+
     function renederOrders() {
         const renderItem = ({ item }) => (
             <View style={{
@@ -158,7 +189,7 @@ const Profile = ({ navigation }) => {
                         {item.status}
                     </Text>
                 </View>
-
+                {item.status == 'onTheWay' ? getTrackOrderBtn(item.restaurantId) : null}
                 <TouchableOpacity
                     style={{
                         // flex: 1,
@@ -179,6 +210,8 @@ const Profile = ({ navigation }) => {
                         <Text style={{ ...FONTS.body4, color: COLORS.white, fontWeight: 'bold' }}>Visit Store</Text>
                     </View>
                 </TouchableOpacity>
+
+
             </View >
         )
 
