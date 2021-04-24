@@ -122,14 +122,14 @@ const Profile = ({ navigation }) => {
         return style
     }
 
-    function getTrackOrderBtn(rid) {
+    function getTrackOrderBtn(order) {
         return (
             <TouchableOpacity
                 style={{
                     // flex: 1,
                     // alignItems: 'flex-end',
                 }}
-                onPress={() => trackOrderBtnClicked(rid)}
+                onPress={() => trackOrderBtnClicked(order)}
             >
                 <View
                     style={{
@@ -147,11 +147,12 @@ const Profile = ({ navigation }) => {
         )
     }
 
-    function trackOrderBtnClicked(rid) {
-        let restaurant = getRestaurantById(rid);
+    function trackOrderBtnClicked(order) {
+        let restaurant = getRestaurantById(order.restaurantId);
         navigation.navigate("OrderDelivary", {
             restaurant,
-            currentLocation
+            currentLocation,
+            order
         })
     }
 
@@ -189,7 +190,7 @@ const Profile = ({ navigation }) => {
                         {item.status}
                     </Text>
                 </View>
-                {item.status == 'onTheWay' ? getTrackOrderBtn(item.restaurantId) : null}
+                {item.status == 'onTheWay' ? getTrackOrderBtn(item) : null}
                 <TouchableOpacity
                     style={{
                         // flex: 1,

@@ -10,9 +10,12 @@ import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
 import MapViewDirections from "react-native-maps-directions";
 
 import { COLORS, FONTS, icons, SIZES } from "../constants"
-import { GOOGLE_API_KEY } from '@env'
+import { GOOGLE_API_KEY, API_BASE_URL } from '@env'
 import PubNubReact from "pubnub-react";
 import PubNub from 'pubnub';
+import io from 'socket.io-client'
+
+const socket = io(API_BASE_URL)
 
 
 const OrderDelivery = ({ route, navigation }) => {
@@ -22,8 +25,15 @@ const OrderDelivery = ({ route, navigation }) => {
 
     const [restaurant, setRestaurant] = React.useState(null)
     const [streetName, setStreetName] = React.useState("")
-    const [fromLocation, setFromLocation] = React.useState(null)
-    const [toLocation, setToLocation] = React.useState(null)
+    const [fromLocation, setFromLocation] = React.useState({
+        latitude: 43.72514748965972,
+        longitude: - 79.29010867127715
+    })
+    const [toLocation, setToLocation] = React.useState({
+        latitude: 43.727449809606625,
+        longitude: - 79.29875598673452
+
+    })
     const [region, setRegion] = React.useState(null)
 
     const [duration, setDuration] = React.useState(0)
@@ -32,7 +42,7 @@ const OrderDelivery = ({ route, navigation }) => {
 
 
     React.useEffect(() => {
-        let { restaurant, currentLocation } = route.params;
+        let { restaurant, currentLocation, order } = route.params;
 
         let fromLoc = {
             latitude: 43.72514748965972,
@@ -49,13 +59,32 @@ const OrderDelivery = ({ route, navigation }) => {
             longitudeDelta: Math.abs(fromLoc.longitude - toLoc.longitude) * 2
         }
 
+        socket.emit('connectForTracking', order._id)
 
-        subscribeToPubNub()
+        socket.on('locationUpdatedFromTrackee', (location) => {
+            console.log('location updated')
+            console.log(location)
+            const { latitude, longitude } = location;
+            const newCoordinate = { latitude, longitude };
+            console.log(newCoordinate)
+            if (Platform.OS === 'android') {
+                if (fromMarker) {
+                    setFromLocation(newCoordinate)
+                    // fromMarker.animateMarkerToCoordinate(newCoordinate, 500);
+                }
+            }
+        })
+        //subscribeToPubNub()
+
         setRestaurant(restaurant)
         setStreetName(street)
         setFromLocation(fromLoc)
         setToLocation(toLoc)
         setRegion(mapRegion)
+
+    }, [])
+
+    React.useEffect(() => {
 
     }, [])
 
@@ -185,7 +214,7 @@ const OrderDelivery = ({ route, navigation }) => {
                     initialRegion={region}
                     style={{ flex: 1 }}
                 >
-                    <MapViewDirections
+                    {/* <MapViewDirections
                         origin={fromLocation}
                         destination={toLocation}
                         apikey={GOOGLE_API_KEY}
@@ -221,7 +250,7 @@ const OrderDelivery = ({ route, navigation }) => {
                                 setIsReady(true)
                             }
                         }}
-                    />
+                    /> */}
                     {destinationMarker()}
                     {carIcon()}
                 </MapView>

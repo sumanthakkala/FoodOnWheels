@@ -3,6 +3,7 @@ import { View, Text, SafeAreaView, FlatList, StyleSheet, TouchableOpacity, Platf
 import axios from 'axios';
 import { API_BASE_URL } from '@env'
 import PubNub from 'pubnub';
+import io from 'socket.io-client'
 import Geolocation from '@react-native-community/geolocation';
 
 
@@ -24,6 +25,8 @@ const styles = StyleSheet.create({
     }
 })
 
+const socket = io(API_BASE_URL)
+
 
 const Home = () => {
 
@@ -36,6 +39,9 @@ const Home = () => {
     const [ordersCopy, setOrdersCopy] = React.useState([])
     const [driverLoc, setDriverLoc] = React.useState({})
     const [watchId, setWatchId] = React.useState(null)
+
+    const [customerSocketId, setCustomerSocketId] = React.useState(null)
+    const [deliveringOrderId, setDeliviringOrderId] = React.useState(null)
 
     const pubnub = new PubNub({
         publishKey: "pub-c-f41fd6dd-81ae-4016-bfb2-cfd55a0e31b5",
@@ -66,15 +72,30 @@ const Home = () => {
             })
     }, [])
 
+    // React.useEffect(() => {
+    //     pubnub?.publish({
+    //         message: {
+    //             latitude: driverLoc?.latitude,
+    //             longitude: driverLoc?.longitude
+    //         },
+    //         channel: "location"
+    //     });
+
+    // }, [driverLoc])
+
     React.useEffect(() => {
-        pubnub?.publish({
-            message: {
-                latitude: driverLoc?.latitude,
-                longitude: driverLoc?.longitude
-            },
-            channel: "location"
-        });
-    }, [driverLoc])
+        socket.on('customerSocketDetails', ({ socketId, orderId }) => {
+            console.log('customer socket')
+            console.log({ socketId, orderId, deliveringOrderId })
+            if (deliveringOrderId === orderId) setCustomerSocketId(socketId)
+        })
+    }, [deliveringOrderId])
+
+    React.useEffect(() => {
+        if (customerSocketId != null) {
+            socket.emit('locationUpdated', { to: customerSocketId, location: driverLoc })
+        }
+    }, [customerSocketId, driverLoc])
 
     const watchLocation = () => {
         var watchId = Geolocation.watchPosition(
@@ -112,11 +133,14 @@ const Home = () => {
             status = 'delivered'
             // setOrders(allorders)
             Geolocation.clearWatch(watchId)
+
         }
         else {
             var order = ordersCopy.filter((order) => order._id === orderId)
             status = 'onTheWay'
             setOrders(order)
+            socket.emit('connectForLocationUpdates', orderId)
+            setDeliviringOrderId(orderId)
             watchLocation()
         }
 
@@ -140,6 +164,8 @@ const Home = () => {
                             setOrdersCopy(preparingOrders)
                             setUserLat(43.72743042699409)
                             setUserLong(-79.29884181730858)
+                            setCustomerSocketId(null)
+                            setDeliviringOrderId(null)
                         })
                 }
 
